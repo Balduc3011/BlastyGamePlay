@@ -12,25 +12,32 @@ public class BaseBlock : MonoBehaviour
     public ColorCode colorCode;
     [OnValueChanged("OnChangeShape")]
     public BlockShape blockShape;
+    public MoveDirection moveDirection;
+    [OnValueChanged("ActiveIced")]
+    public bool isIced;
     public MapConstructor mapConstructor;
+    [HideInInspector] public List<BoxCollider> colliders;
     public Coordinate coordinate;
     public List<Coordinate> blockCoordinates;
     public List<Coordinate> blockAbsoluteCoordinates;
-    public IndexShow indexShowPrefab;
-    public List<IndexShow> indexShows;
+    [HideInInspector] public IndexShow indexShowPrefab;
+    [HideInInspector] public List<IndexShow> indexShows;
     public Transform blockModel;
-    public Vector3 clickPosition;
-    public Vector3 clickDelta;
+    [HideInInspector] public Vector3 clickPosition;
+    [HideInInspector] public Vector3 clickDelta;
     public Rigidbody rigidbody;
-    public Vector3 newVelocity;
-    Queue<Vector3> velocityQueue = new Queue<Vector3>();
-    Vector3 lastClickPos = Vector3.zero;
-    public List<Transform> blockChild;
+    [HideInInspector] public Vector3 newVelocity;
+    [HideInInspector] Queue<Vector3> velocityQueue = new Queue<Vector3>();
+    [HideInInspector] Vector3 lastClickPos = Vector3.zero;
+    [HideInInspector] public List<Transform> blockChild;
     public Transform blockParent;
-    public Transform blockBase;
-    public bool markedToEliminate = false;
-    public List<ChildBlock> childBlocks;
-    public List<int> checkedCoordinate = new List<int>();
+    [HideInInspector] public Transform blockBase;
+    [HideInInspector] public bool markedToEliminate = false;
+    [HideInInspector] public List<ChildBlock> childBlocks;
+    [HideInInspector] public List<int> checkedCoordinate = new List<int>();
+    // SpecialBlock
+    
+    public IceBlock iceBlock;
     private void Start()
     {
         InitFirstValue();
@@ -94,6 +101,11 @@ public class BaseBlock : MonoBehaviour
 
     #region Init
 
+    public void Init()
+    {
+        OnChangeColorCode();
+    }
+    
     public void InitColor(ColorCode relativeColor)
     {
         // if (meshRenderer != null)
@@ -147,6 +159,27 @@ public class BaseBlock : MonoBehaviour
             blockCoordinates.AddRange(blockShapeData.blockCoordinates);
         }
         CheckIndexShow(blockShapeData.blockCoordinates);
+        InitCollider();
+    }
+
+    void InitCollider()
+    {
+        for (var i = 0; i < blockCoordinates.Count; i++)
+        {
+            if (i >= colliders.Count)
+            {
+                BoxCollider newCollider = gameObject.AddComponent<BoxCollider>();
+                newCollider.material = ColorGlobalConfig.Instance.blockPhysicMaterial;
+                colliders.Add(newCollider);
+            }
+            colliders[i].enabled = true;
+            colliders[i].size = new Vector3(0.9f, 1f, 0.9f);
+            colliders[i].center = new Vector3(blockCoordinates[i].xIndex, 0.5f, blockCoordinates[i].yIndex);
+        }
+        for(int i = blockCoordinates.Count; i < colliders.Count; i++)
+        {
+            colliders[i].enabled = false;
+        }
     }
 
     public List<Transform> GetListTransformsByName(Transform parent, string nameContains)
@@ -163,6 +196,28 @@ public class BaseBlock : MonoBehaviour
         }
         return matchingTransforms;
     }
+
+    void ActiveIced()
+    {
+        if (isIced)
+        {
+            if(iceBlock == null)
+                iceBlock = gameObject.AddComponent<IceBlock>();
+            if(iceBlock.iceCounter == null)
+                iceBlock.iceCounter = Instantiate(ColorGlobalConfig.Instance.iceCounterPrefab, indexShowPrefab.transform.parent);
+            iceBlock.baseBlock = this;
+            iceBlock.iceCounter.transform.localPosition = Vector3.up * 1f;
+            iceBlock.Active(true);
+        }
+        else
+        {
+            if(iceBlock != null)
+            {
+                iceBlock.Active(false);
+            }
+        }
+    }
+    
     #endregion
 
     #region GamePlay
@@ -171,14 +226,14 @@ public class BaseBlock : MonoBehaviour
     {
         this.clickPosition = clickPosition;
         clickDelta = clickPosition - transform.position;
-        blockModel.localPosition = Vector3.up * 0.2f;
+        blockModel.localPosition = Vector3.up * 0.7f;
         mapConstructor.SetSelectedBlock(this);
         SetBGBlock(false);
     }
     
     public void OnBlockDeselected()
     {
-        blockModel.localPosition = Vector3.zero;
+        blockModel.localPosition = Vector3.up * 0.5f;
         SetBlockNewPos();
         mapConstructor.DeSelectBlock();
         rigidbody.velocity = Vector3.zero;
@@ -201,16 +256,42 @@ public class BaseBlock : MonoBehaviour
             blockAbsoluteCoordinates[i].yIndex = blockCoordinates[i].yIndex + coordinate.yIndex;
         }
     }
+
+    public bool IsBlockMoveable()
+    {
+        if(isIced && iceBlock != null && !iceBlock.IsIceBroke())
+        {
+            return false;
+        }
+
+        return true;
+    }
     
     public void SetBlockPosition(Vector3 position)
     {
         if(position.y != 0)
             return;
+        if(!IsBlockMoveable()) 
+            return;
         lastClickPos = position;
         Vector3 distance = position - clickDelta - rigidbody.position;
         distance = Vector3.ClampMagnitude(distance, 1);
+        distance = ClampVelocity(distance);
         newVelocity = (distance) * 30;
         velocityQueue.Enqueue(newVelocity);
+    }
+    
+    Vector3 ClampVelocity(Vector3 velocity)
+    {
+        if (moveDirection == MoveDirection.Horizontal)
+        {
+            velocity.z = 0;
+        }
+        else if (moveDirection == MoveDirection.Vertical)
+        {
+            velocity.x = 0;
+        }
+        return velocity;
     }
 
     private void FixedUpdate()
@@ -247,6 +328,8 @@ public class BaseBlock : MonoBehaviour
     public bool HasBlockOnTile(Coordinate coordinate, ColorCode colorCode)
     {
         if(this.colorCode != colorCode)
+            return false;
+        if (!IsBlockMoveable())
             return false;
         for (var i = 0; i < blockAbsoluteCoordinates.Count; i++)
         {
@@ -286,13 +369,14 @@ public class BaseBlock : MonoBehaviour
     public void CheckNewChildBlock()
     {
         CheckHasCoordinate();
-        //SpawnNewChild();
+        SpawnNewChild();
     }
     
     void CheckHasCoordinate()
     {
         if(childBlocks == null)
             childBlocks = new List<ChildBlock>();
+        checkedCoordinate = new List<int>();
         childBlocks.Clear();
         while (blockCoordinates.Count > 0)
         {
@@ -300,7 +384,7 @@ public class BaseBlock : MonoBehaviour
             childBlocks.Add(childBlock);
             childBlock.firstCoordinate = new Coordinate(blockCoordinates[0]);
             childBlock.sampleList = new List<Coordinate>();
-            checkedCoordinate = new List<int>();
+            checkedCoordinate.Clear();
             childBlock. sampleList = CheckHasCoordinate(new Coordinate(blockCoordinates[0]));
             childBlock.sampleList = RemoveDuplicateCoordinates(childBlock.sampleList);
             RemoveBlockCoordinate(childBlock.sampleList);
@@ -385,9 +469,34 @@ public class BaseBlock : MonoBehaviour
         for (var i = 0; i < childBlocks.Count; i++)
         {
             var child = childBlocks[i];
-            BaseBlock newBlock = Instantiate(mapConstructor.baseBlockPrefab, transform.parent);
+            BaseBlock newBlock = Instantiate(ColorGlobalConfig.Instance.baseBlockPrefab, transform.parent);
             newBlock.blockShape = child.blockShape;
             newBlock.colorCode = colorCode;
+            newBlock.mapConstructor = mapConstructor;
+            mapConstructor.AddBlock(newBlock);
+            newBlock.Init();
+            if (ColorGlobalConfig.Instance.CheckHasCoordinate(child.blockShape, 0, 0))
+            {
+                newBlock.transform.localPosition = transform.position + 
+                    new Vector3(child.firstCoordinate.xIndex, 0, child.firstCoordinate.yIndex);
+            }
+            else
+            {
+                newBlock.transform.localPosition = transform.position;
+            }
+        }
+    }
+    
+    public void OnOneLineResolved()
+    {
+        if (isIced && iceBlock != null)
+        {
+            iceBlock.OnOneLineResolved();
+            if (iceBlock.IsIceBroke())
+            {
+                isIced = false;
+                ActiveIced();
+            }
         }
     }
     #endregion
@@ -399,4 +508,11 @@ public class ChildBlock
     public BlockShape blockShape;
     public Coordinate firstCoordinate;
     public List<Coordinate> sampleList = new List<Coordinate>();
+}
+
+public enum MoveDirection
+{
+    All = 0,
+    Horizontal = 1,
+    Vertical = 2,
 }

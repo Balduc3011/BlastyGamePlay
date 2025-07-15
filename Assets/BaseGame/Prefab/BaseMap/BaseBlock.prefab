@@ -178,8 +178,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colorCode: 0
-  BlockShape: 0
+  blockShape: 0
   mapConstructor: {fileID: 0}
+  colliders:
+  - {fileID: 3709871554095886285}
   coordinate:
     xIndex: 0
     yIndex: 0
@@ -199,6 +201,9 @@ MonoBehaviour:
   blockChild: []
   blockParent: {fileID: 7456044415319118766}
   blockBase: {fileID: 0}
+  markedToEliminate: 0
+  childBlocks: []
+  checkedCoordinate: 
 --- !u!65 &3709871554095886285
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -218,8 +223,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.9, y: 1, z: 0.9}
-  m_Center: {x: 0.5, y: 0.5, z: 0}
+  m_Size: {x: 0.9, y: 1, z: 0.9}
+  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!1 &3729937064187782444
 GameObject:
   m_ObjectHideFlags: 0

@@ -21,7 +21,6 @@ public class MapConstructor : MonoBehaviour
 
     public List<BaseBlock> blocks;
     public List<EliminateLine> eliminateLines;
-    public BaseBlock baseBlockPrefab;
 
     #region InitMap
 
@@ -197,6 +196,18 @@ public class MapConstructor : MonoBehaviour
         }
         return false;
     }
+    public void AddBlock(BaseBlock block)
+    {
+        if (blocks == null)
+        {
+            blocks = new List<BaseBlock>();
+        }
+        if (!blocks.Contains(block))
+        {
+            blocks.Add(block);
+        }
+    }
+    
     public void RemoveBlock(BaseBlock block)
     {
         if (blocks.Contains(block))
@@ -261,7 +272,10 @@ public class MapConstructor : MonoBehaviour
                     List<Coordinate> toEliminate = CheckLine(gate.floorTileWall.floorTile.coordinate, matchedGate.floorTileWall.floorTile.coordinate, gate.colorCode);
                     if (toEliminate != null && toEliminate.Count > 0)
                     {
-                        eliminateLines.Add(new EliminateLine(toEliminate));
+                        EliminateLine toEliminateLine = new EliminateLine(toEliminate);
+                        toEliminateLine.toEliminateGates.Add(gate);
+                        toEliminateLine.toEliminateGates.Add(matchedGate);
+                        eliminateLines.Add(toEliminateLine);
                     }
                     break;
                 }
@@ -383,9 +397,21 @@ public class MapConstructor : MonoBehaviour
     
     void EliminateBlock()
     {
-        for (var i = 0; i < blocks.Count; i++)
+        for (var i = blocks.Count - 1; i >= 0; i--)
         {
             blocks[i].EliminateBlock();
+        }
+        for (var i = 0; i < eliminateLines.Count; i++)
+        {
+            for (var i1 = 0; i1 < eliminateLines[i].toEliminateGates.Count; i1++)
+            {
+                eliminateLines[i].toEliminateGates[i1].EliminateGate();
+            }
+
+            for (var i1 = 0; i1 < blocks.Count; i1++)
+            {
+                blocks[i1].OnOneLineResolved();
+            }
         }
     }
     #endregion
@@ -418,6 +444,7 @@ public class Coordinate
 [System.Serializable]
 public class EliminateLine
 {
+    public List<BaseGate> toEliminateGates = new List<BaseGate>();
     public List<Coordinate> toEliminateCoordinates = new List<Coordinate>();
     public EliminateLine(List<Coordinate> coordinates)
     {

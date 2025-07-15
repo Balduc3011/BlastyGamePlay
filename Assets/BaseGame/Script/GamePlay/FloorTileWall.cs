@@ -40,7 +40,11 @@ public class FloorTileWall : MonoBehaviour
                 break;
         }
     }
-
+    public void SwitchWallType(WallType newWallType)
+    {
+        wallType = newWallType;
+        OnChangeWallType();
+    }
     public void OnChangeWallType()
     {
         switch (wallType)

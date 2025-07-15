@@ -24,9 +24,12 @@ public class InputManager : MonoBehaviour
                 BaseBlock baseBlock = hit.collider.GetComponent<BaseBlock>();
                 if (baseBlock != null)
                 {
-                    selectedBlock = baseBlock;
-                    blockSelected = true;
-                    selectedBlock.OnBlockSelected(GetMousePointOnGround());
+                    if (baseBlock.IsBlockMoveable())
+                    {
+                        selectedBlock = baseBlock;
+                        blockSelected = true;
+                        selectedBlock.OnBlockSelected(GetMousePointOnGround());
+                    }
                 }
             }
         }

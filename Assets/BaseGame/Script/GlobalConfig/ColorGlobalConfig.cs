@@ -11,6 +11,9 @@ public class ColorGlobalConfig : GlobalConfig<ColorGlobalConfig>
 {
     public List<BlockColorConfig> blockColorConfigs;
     public List<BlockShapeData> blockShapeDatas;
+    public BaseBlock baseBlockPrefab;
+    public PhysicMaterial blockPhysicMaterial;
+    public IceCounter iceCounterPrefab;
 
     [Button]
     public void FetchColor()
@@ -90,8 +93,16 @@ public class ColorGlobalConfig : GlobalConfig<ColorGlobalConfig>
         }
         Debug.Log($"{count} block has coordinate ({x},{y})");
     }
+    public bool CheckHasCoordinate(BlockShape blockShape, int x, int y)
+    {
+        return CheckHasCoordinate(GetBlockShapeData(blockShape), x, y);
+    }
     public bool CheckHasCoordinate(BlockShapeData blockShapeData, int x, int y)
     {
+        if(blockShapeData == null || blockShapeData.blockCoordinates == null)
+        {
+            return false;
+        }
         for (var i1 = 0; i1 < blockShapeData.blockCoordinates.Count; i1++)
         {
             if(blockShapeData.blockCoordinates[i1].xIndex == x && blockShapeData.blockCoordinates[i1].yIndex == y)

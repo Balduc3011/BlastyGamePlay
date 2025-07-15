@@ -22,4 +22,10 @@ public class BaseGate : MonoBehaviour
             meshRenderer.mesh = ColorGlobalConfig.Instance.GetGateMesh(colorCode);
         }
     }
+
+    public void EliminateGate()
+    {
+        floorTileWall.SwitchWallType(WallType.Wall);
+    }
+    
 }
