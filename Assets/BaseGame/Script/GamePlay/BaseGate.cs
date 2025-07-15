@@ -8,10 +8,18 @@ public class BaseGate : MonoBehaviour
     public FloorTileWall floorTileWall;
     [OnValueChanged("OnChangeColorCode")]
     public ColorCode colorCode;
-    public MeshRenderer meshRenderer;
+    public MeshFilter meshRenderer;
 
     public void OnChangeColorCode()
     {
-        meshRenderer.material = ColorGlobalConfig.Instance.GetBlockMaterial(colorCode);
+        meshRenderer.mesh = ColorGlobalConfig.Instance.GetGateMesh(colorCode);
+    }
+    
+    public void InitColor(ColorCode relativeColor)
+    {
+        if (meshRenderer != null)
+        {
+            meshRenderer.mesh = ColorGlobalConfig.Instance.GetGateMesh(colorCode);
+        }
     }
 }

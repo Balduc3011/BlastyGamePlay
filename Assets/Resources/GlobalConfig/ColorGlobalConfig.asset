@@ -15,25 +15,378 @@ MonoBehaviour:
   blockColorConfigs:
   - colorCode: 1
     blockMaterial: {fileID: 2100000, guid: da8a5012b4fabf44d8cabecd417282b2, type: 2}
-    grainMaterial: {fileID: 2100000, guid: da8a5012b4fabf44d8cabecd417282b2, type: 2}
+    grainMaterial: {fileID: 2100000, guid: f146a79c6144c5649b38529fad2c12f4, type: 2}
+    blockAll: {fileID: 919132149155446097, guid: 84a6e4ce64bbc564b9827c3dc0f2a857, type: 3}
+    gateMesh: {fileID: 3935520107083071274, guid: 146ff8199ba96f0459467ef30641135c, type: 3}
   - colorCode: 2
     blockMaterial: {fileID: 2100000, guid: e2bd060b46bd7784a8c6cbd7876fff38, type: 2}
-    grainMaterial: {fileID: 2100000, guid: e2bd060b46bd7784a8c6cbd7876fff38, type: 2}
+    grainMaterial: {fileID: 2100000, guid: 0ff1bac766514c2448d001b95023f101, type: 2}
+    blockAll: {fileID: 919132149155446097, guid: b065b46f7ee25d046aa8d92037b94835, type: 3}
+    gateMesh: {fileID: -8620415812867209302, guid: 6f44811654a15a34b9722f70c637685a, type: 3}
   - colorCode: 3
     blockMaterial: {fileID: 2100000, guid: e88890a6dc408b84c9025a4c22a6a849, type: 2}
-    grainMaterial: {fileID: 2100000, guid: e88890a6dc408b84c9025a4c22a6a849, type: 2}
+    grainMaterial: {fileID: 2100000, guid: 7f9649bbe5e920443862e515bd4d8406, type: 2}
+    blockAll: {fileID: 919132149155446097, guid: 90368a0fecc84b24a8e4c6a0473b7f35, type: 3}
+    gateMesh: {fileID: 1038750107831768066, guid: b6bd8ea21acf6de47be6131858d071f9, type: 3}
   - colorCode: 4
     blockMaterial: {fileID: 2100000, guid: 3ffc2a28f5eea944988e16b3c1f8a664, type: 2}
-    grainMaterial: {fileID: 2100000, guid: 3ffc2a28f5eea944988e16b3c1f8a664, type: 2}
+    grainMaterial: {fileID: 2100000, guid: 2ca0b1bcfe5cd74418f149d3c60ddde2, type: 2}
+    blockAll: {fileID: 919132149155446097, guid: 4d7111a04f081ba4c998cab54c6ade83, type: 3}
+    gateMesh: {fileID: -8132265839171366688, guid: 764237717825f844ba26a22eea9c708c, type: 3}
   - colorCode: 5
     blockMaterial: {fileID: 2100000, guid: 657a1f1b05e02a449a61f412e7ecbc9d, type: 2}
-    grainMaterial: {fileID: 2100000, guid: 657a1f1b05e02a449a61f412e7ecbc9d, type: 2}
+    grainMaterial: {fileID: 2100000, guid: f7cae1edfe4130844bef31f2293159a0, type: 2}
+    blockAll: {fileID: 919132149155446097, guid: 9ec22f739a573614a9c357d9ab2f71b7, type: 3}
+    gateMesh: {fileID: -7546467533964439645, guid: 5dab9a8dbe2919c48a08e6bf2c3d47f8, type: 3}
   - colorCode: 6
     blockMaterial: {fileID: 2100000, guid: 703bbb060a3d8ff46b6e2b1e3493767c, type: 2}
-    grainMaterial: {fileID: 2100000, guid: 703bbb060a3d8ff46b6e2b1e3493767c, type: 2}
+    grainMaterial: {fileID: 2100000, guid: 72d3750dcbb17924fb577dd7a5100eb8, type: 2}
+    blockAll: {fileID: 919132149155446097, guid: ff70024fa0dc068498187ab84f6106db, type: 3}
+    gateMesh: {fileID: 2271508976450786084, guid: a65e861c1c5b9d24a87311571895186e, type: 3}
   - colorCode: 7
     blockMaterial: {fileID: 2100000, guid: c4261170601e8d94887708ab9c83ec73, type: 2}
-    grainMaterial: {fileID: 2100000, guid: c4261170601e8d94887708ab9c83ec73, type: 2}
+    grainMaterial: {fileID: 2100000, guid: 916cf1f941793ae4cb9433d292cb11e9, type: 2}
+    blockAll: {fileID: 919132149155446097, guid: e124d7ac563395a41b10591526ec1cf7, type: 3}
+    gateMesh: {fileID: 4776347582098379705, guid: a21191b9e28aa984a86f04df2842a65e, type: 3}
   - colorCode: 8
     blockMaterial: {fileID: 2100000, guid: 13493d3cf6520d343a7bdf49bf7c42d2, type: 2}
-    grainMaterial: {fileID: 2100000, guid: 13493d3cf6520d343a7bdf49bf7c42d2, type: 2}
+    grainMaterial: {fileID: 2100000, guid: f34e7dd17d32f3d4ca11c7788e673625, type: 2}
+    blockAll: {fileID: 919132149155446097, guid: c06d2413910a14349a63ad0f6c82e94d, type: 3}
+    gateMesh: {fileID: -7880711996766987663, guid: ba36026fe9ba4064b98cb0c0c0c1a603, type: 3}
+  - colorCode: 9
+    blockMaterial: {fileID: 0}
+    grainMaterial: {fileID: 2100000, guid: f948b9ccef5fb9948a7319162b235d8e, type: 2}
+    blockAll: {fileID: 919132149155446097, guid: 8c471d3a24f17a54c933d3577bc61d8e, type: 3}
+    gateMesh: {fileID: 3347191747185522547, guid: ddffcb8eba06f2a48acb7227e92040ab, type: 3}
+  - colorCode: 10
+    blockMaterial: {fileID: 0}
+    grainMaterial: {fileID: 2100000, guid: 9985b64341ab3b8469b385dd7dd6b507, type: 2}
+    blockAll: {fileID: 919132149155446097, guid: 7e0072fe9c0cb3b45a0e0a9367114d5a, type: 3}
+    gateMesh: {fileID: 1974951439570254680, guid: 3785ac6179c36e643959404223049c17, type: 3}
+  blockShapeDatas:
+  - blockShape: 1
+    blockName: Block_0
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    blockPos: {x: 0, y: 0, z: 0}
+    blockAngle: {x: 0, y: 180, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 2
+    blockName: Block_2
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 0
+    blockPos: {x: 0, y: 0, z: 0}
+    blockAngle: {x: 0, y: 180, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 3
+    blockName: Block_2
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 0
+      yIndex: 1
+    blockPos: {x: 1, y: 0, z: 0}
+    blockAngle: {x: 0, y: 90, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 4
+    blockName: Block_3
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 0
+    - xIndex: 2
+      yIndex: 0
+    blockPos: {x: 0, y: 0, z: 0}
+    blockAngle: {x: 0, y: 180, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 5
+    blockName: Block_3
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 0
+      yIndex: 1
+    - xIndex: 0
+      yIndex: 2
+    blockPos: {x: 1, y: 0, z: 0}
+    blockAngle: {x: 0, y: 90, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 6
+    blockName: Block_1
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 0
+    - xIndex: 0
+      yIndex: 1
+    - xIndex: 1
+      yIndex: 1
+    blockPos: {x: 0, y: 0, z: -0.25}
+    blockAngle: {x: 0, y: 180, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 7
+    blockName: Block_4
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 0
+    - xIndex: 2
+      yIndex: 0
+    - xIndex: 3
+      yIndex: 0
+    blockPos: {x: 0, y: 0, z: 0}
+    blockAngle: {x: 0, y: 180, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 8
+    blockName: Block_4
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 0
+      yIndex: 1
+    - xIndex: 0
+      yIndex: 2
+    - xIndex: 0
+      yIndex: 3
+    blockPos: {x: 1, y: 0, z: 0}
+    blockAngle: {x: 0, y: 90, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 9
+    blockName: Block_5
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 0
+    - xIndex: 2
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 1
+    blockPos: {x: 0, y: 0, z: 0}
+    blockAngle: {x: 0, y: 180, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 10
+    blockName: Block_5
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 1
+    - xIndex: 1
+      yIndex: 1
+    - xIndex: 2
+      yIndex: 1
+    - xIndex: 1
+      yIndex: 0
+    blockPos: {x: 3, y: 0, z: 2}
+    blockAngle: {x: 0, y: 0, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 11
+    blockName: Block_5
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 0
+      yIndex: 1
+    - xIndex: 0
+      yIndex: 2
+    - xIndex: 1
+      yIndex: 1
+    blockPos: {x: 0, y: 0, z: 3}
+    blockAngle: {x: 0, y: -90, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 12
+    blockName: Block_5
+    blockCoordinates:
+    - xIndex: 1
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 1
+    - xIndex: 1
+      yIndex: 2
+    - xIndex: 0
+      yIndex: 1
+    blockPos: {x: 2, y: 0, z: 0}
+    blockAngle: {x: 0, y: 90, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 13
+    blockName: Block_6
+    blockCoordinates:
+    - xIndex: 1
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 1
+    - xIndex: 1
+      yIndex: 2
+    - xIndex: 0
+      yIndex: 1
+    - xIndex: 2
+      yIndex: 1
+    blockPos: {x: 2, y: 0, z: 2}
+    blockAngle: {x: 0, y: 0, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 14
+    blockName: Block_8
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 0
+    - xIndex: 0
+      yIndex: 1
+    blockPos: {x: 0, y: 0, z: -0.25}
+    blockAngle: {x: 0, y: 180, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 15
+    blockName: Block_8
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 1
+    blockPos: {x: 2.25, y: 0, z: 0}
+    blockAngle: {x: 0, y: 90, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 16
+    blockName: Block_8
+    blockCoordinates:
+    - xIndex: 1
+      yIndex: 0
+    - xIndex: 0
+      yIndex: 1
+    - xIndex: 1
+      yIndex: 1
+    blockPos: {x: 2, y: 0, z: 2.25}
+    blockAngle: {x: 0, y: 0, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 17
+    blockName: Block_8
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 0
+      yIndex: 1
+    - xIndex: 1
+      yIndex: 1
+    blockPos: {x: -0.25, y: 0, z: 2}
+    blockAngle: {x: 0, y: -90, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 18
+    blockName: Block_7
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 0
+    - xIndex: 2
+      yIndex: 0
+    - xIndex: 0
+      yIndex: 1
+    blockPos: {x: 0, y: 0, z: 0}
+    blockAngle: {x: 0, y: 90, z: 0}
+    blockScale: {x: 1, y: 1, z: -1}
+  - blockShape: 19
+    blockName: Block_7
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 0
+    - xIndex: 2
+      yIndex: 0
+    - xIndex: 2
+      yIndex: 1
+    blockPos: {x: 3, y: 0, z: 0}
+    blockAngle: {x: 0, y: 90, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 20
+    blockName: Block_7
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 1
+    - xIndex: 1
+      yIndex: 1
+    - xIndex: 2
+      yIndex: 1
+    - xIndex: 0
+      yIndex: 0
+    blockPos: {x: 0, y: 0, z: 2}
+    blockAngle: {x: 0, y: -90, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 21
+    blockName: Block_7
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 1
+    - xIndex: 1
+      yIndex: 1
+    - xIndex: 2
+      yIndex: 1
+    - xIndex: 2
+      yIndex: 0
+    blockPos: {x: 3, y: 0, z: 2}
+    blockAngle: {x: 0, y: 90, z: 0}
+    blockScale: {x: -1, y: 1, z: 1}
+  - blockShape: 22
+    blockName: Block_7
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 0
+    - xIndex: 0
+      yIndex: 1
+    - xIndex: 0
+      yIndex: 2
+    blockPos: {x: 0, y: 0, z: 0}
+    blockAngle: {x: 0, y: 180, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}
+  - blockShape: 23
+    blockName: Block_7
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 1
+    - xIndex: 1
+      yIndex: 2
+    blockPos: {x: 2, y: 0, z: 0}
+    blockAngle: {x: 0, y: 180, z: 0}
+    blockScale: {x: -1, y: 1, z: 1}
+  - blockShape: 24
+    blockName: Block_7
+    blockCoordinates:
+    - xIndex: 0
+      yIndex: 0
+    - xIndex: 0
+      yIndex: 1
+    - xIndex: 0
+      yIndex: 2
+    - xIndex: 1
+      yIndex: 2
+    blockPos: {x: 0, y: 0, z: 3}
+    blockAngle: {x: 0, y: 180, z: 0}
+    blockScale: {x: 1, y: 1, z: -1}
+  - blockShape: 25
+    blockName: Block_7
+    blockCoordinates:
+    - xIndex: 1
+      yIndex: 0
+    - xIndex: 1
+      yIndex: 1
+    - xIndex: 0
+      yIndex: 2
+    - xIndex: 1
+      yIndex: 2
+    blockPos: {x: 2, y: 0, z: 3}
+    blockAngle: {x: 0, y: 0, z: 0}
+    blockScale: {x: 1, y: 1, z: 1}

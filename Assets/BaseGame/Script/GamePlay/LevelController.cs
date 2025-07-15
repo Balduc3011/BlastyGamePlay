@@ -13,6 +13,7 @@ public class LevelController : MonoBehaviour
     {
         blocks = mapConstructor.blocks;
         InitBlockColor();
+        InteGateColor();
         mapConstructor.SetFloorTiled();
     }
 
@@ -21,6 +22,14 @@ public class LevelController : MonoBehaviour
         for (var i = 0; i < blocks.Count; i++)
         {
             blocks[i].InitColor(GetRelativeColor(blocks[i].colorCode));
+        }
+    }
+
+    void InteGateColor()
+    {
+        for (var i = 0; i < mapConstructor.gates.Count; i++)
+        {
+            mapConstructor.gates[i].InitColor(GetRelativeColor(mapConstructor.gates[i].colorCode));
         }
     }
 

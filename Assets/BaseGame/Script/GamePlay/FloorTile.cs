@@ -18,16 +18,16 @@ public class FloorTile : MonoBehaviour
 
     public void SetTiledMaterial(float tillX, float tillY, float offsetX, float offsetY)
     {
-        if (grainMesh == null) return;
-
-        Material tiledMaterial = new Material(grainMesh.material);
-        // Thay đổi Tiling (x, y)
-        tiledMaterial.SetTextureScale("_MainTex", new Vector2(tillX, tillY));
-
-        // Thay đổi Offset (x, y)
-        tiledMaterial.SetTextureOffset("_MainTex", new Vector2(offsetX, offsetY));
-        grainMesh.material = tiledMaterial;
-        grainMesh.gameObject.SetActive(true);
+        // if (grainMesh == null) return;
+        //
+        // Material tiledMaterial = new Material(grainMesh.material);
+        // // Thay đổi Tiling (x, y)
+        // tiledMaterial.SetTextureScale("_MainTex", new Vector2(tillX, tillY));
+        //
+        // // Thay đổi Offset (x, y)
+        // tiledMaterial.SetTextureOffset("_MainTex", new Vector2(offsetX, offsetY));
+        // grainMesh.material = tiledMaterial;
+        // grainMesh.gameObject.SetActive(true);
     }
 
     public void SetTileIndex(int x, int y)
@@ -51,6 +51,7 @@ public class FloorTile : MonoBehaviour
                 SpawnWall(direction);
             }
         }
+        CheckBorder();
     }
     
     [Button]
@@ -66,5 +67,26 @@ public class FloorTile : MonoBehaviour
         wall.SetTouchDirection(direction);
         walls.Add(wall);
         wall.floorTile = this;
+    }
+
+    void CheckBorder()
+    {
+        for (var i = 0; i < walls.Count; i++)
+        {
+            walls[i].CheckBorder();
+        }
+    }
+
+    public bool CheckHasWall(TouchDirection touchDirection)
+    {
+        for (var i = 0; i < walls.Count; i++)
+        {
+            if (walls[i].touchDirection == touchDirection)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

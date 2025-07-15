@@ -20,6 +20,8 @@ public class MapConstructor : MonoBehaviour
     public float yDelta = 0;
 
     public List<BaseBlock> blocks;
+    public List<EliminateLine> eliminateLines;
+    public BaseBlock baseBlockPrefab;
 
     #region InitMap
 
@@ -139,6 +141,7 @@ public class MapConstructor : MonoBehaviour
                 DestroyImmediate(floorTiles[i].gameObject);
         }
         floorTiles.Clear();
+        gates.Clear();
     }
     
     public List<TouchDirection> GetTouchDirections(Coordinate coordinate)
@@ -170,6 +173,37 @@ public class MapConstructor : MonoBehaviour
         }
         return directions;
     }
+
+    bool HasTiles(Coordinate coordinate)
+    {
+        for (var i = 0; i < tileCoordinates.Count; i++)
+        {
+            if(tileCoordinates[i].xIndex == coordinate.xIndex && tileCoordinates[i].yIndex == coordinate.yIndex)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    bool HasBlockOnTile(Coordinate coordinate, ColorCode colorCode)
+    {
+        for (var i = 0; i < blocks.Count; i++)
+        {
+            if(blocks[i].HasBlockOnTile(coordinate, colorCode))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    public void RemoveBlock(BaseBlock block)
+    {
+        if (blocks.Contains(block))
+        {
+            blocks.Remove(block);
+        }
+    }
     #endregion
 
     #region GamePlay
@@ -200,26 +234,35 @@ public class MapConstructor : MonoBehaviour
     public void DeSelectBlock()
     {
         CheckBlockEliminate();
+        EliminateBlockCoordinate();
+        EliminateBlock();
     }
 
     void CheckBlockEliminate()
     {
+        if(eliminateLines == null)
+            eliminateLines = new List<EliminateLine>();
+        eliminateLines.Clear();
         List<BaseGate> checkedGates = new List<BaseGate>();
         for (int i = 0; i < gates.Count; i++)
         {
             BaseGate gate = gates[i];
-            checkedGates.Add(gate);
             BaseGate matchedGate = null;
+            checkedGates.Add(gate);
             for (int j = 0; j < gates.Count; j++)
             {
-                if(gate == gates[j])
-                    continue;
-                if(checkedGates.Contains(gates[i]))
+                // if(gate == gates[j])
+                //     continue;
+                if(checkedGates.Contains(gates[j]))
                     continue;
                 if (CheckMatchingGate(gate, gates[j]))
                 {
                     matchedGate = gates[j];
-                    CheckLine(gate, matchedGate);
+                    List<Coordinate> toEliminate = CheckLine(gate.floorTileWall.floorTile.coordinate, matchedGate.floorTileWall.floorTile.coordinate, gate.colorCode);
+                    if (toEliminate != null && toEliminate.Count > 0)
+                    {
+                        eliminateLines.Add(new EliminateLine(toEliminate));
+                    }
                     break;
                 }
             }
@@ -233,30 +276,118 @@ public class MapConstructor : MonoBehaviour
         if (gate1.floorTileWall.floorTile.coordinate.xIndex != gate2.floorTileWall.floorTile.coordinate.xIndex
             && gate1.floorTileWall.floorTile.coordinate.yIndex != gate2.floorTileWall.floorTile.coordinate.yIndex)
             return false;
-        if (gate1.floorTileWall.floorTile.coordinate.xIndex == gate2.floorTileWall.floorTile.coordinate.xIndex)
+        if (gate1.floorTileWall.floorTile.coordinate.yIndex == gate2.floorTileWall.floorTile.coordinate.yIndex)
         {
-            if (gate1.floorTileWall.touchDirection == TouchDirection.Left && gate2.floorTileWall.touchDirection == TouchDirection.Right)
-                return true;
-            if (gate1.floorTileWall.touchDirection == TouchDirection.Right && gate2.floorTileWall.touchDirection == TouchDirection.Left)
-                return true;
+            if ((gate1.floorTileWall.touchDirection == TouchDirection.Left && gate2.floorTileWall.touchDirection == TouchDirection.Right)
+                || (gate1.floorTileWall.touchDirection == TouchDirection.Right && gate2.floorTileWall.touchDirection == TouchDirection.Left))
+                return CheckInLine(gate1.floorTileWall.floorTile.coordinate, gate2.floorTileWall.floorTile.coordinate);
         }
-        else if (gate1.floorTileWall.floorTile.coordinate.yIndex == gate2.floorTileWall.floorTile.coordinate.yIndex)
+        else if (gate1.floorTileWall.floorTile.coordinate.xIndex == gate2.floorTileWall.floorTile.coordinate.xIndex)
         {
-            if (gate1.floorTileWall.touchDirection == TouchDirection.Up && gate2.floorTileWall.touchDirection == TouchDirection.Down)
-                return true;
-            if (gate1.floorTileWall.touchDirection == TouchDirection.Down && gate2.floorTileWall.touchDirection == TouchDirection.Up)
-                return true;
+            if ((gate1.floorTileWall.touchDirection == TouchDirection.Up && gate2.floorTileWall.touchDirection == TouchDirection.Down)
+                || (gate1.floorTileWall.touchDirection == TouchDirection.Down && gate2.floorTileWall.touchDirection == TouchDirection.Up))
+                return CheckInLine(gate1.floorTileWall.floorTile.coordinate, gate2.floorTileWall.floorTile.coordinate);
         }
         return false;
     }
     
-    void CheckInLine(BaseGate gate1, BaseGate gate2)
+    bool CheckInLine(Coordinate pos1, Coordinate pos2)
     {
-        
+        bool isHorizontal = pos1.yIndex == pos2.yIndex;
+        if (isHorizontal)
+        {
+            int mixX = Mathf.Min(pos1.xIndex, pos2.xIndex);
+            int maxX = Mathf.Max(pos1.xIndex, pos2.xIndex);
+            int yIndex = pos1.yIndex; // Assuming both have the same Y index for horizontal check
+            for (int i = mixX; i < maxX + 1; i++)
+            {
+                if(!HasTiles(new Coordinate(i, yIndex)))
+                    return false;
+            }
+            return true;
+        }
+        else
+        {
+            int mixY = Mathf.Min(pos1.yIndex, pos2.yIndex);
+            int maxY = Mathf.Max(pos1.yIndex, pos2.yIndex);
+            int xIndex = pos1.xIndex; // Assuming both have the same X index for vertical check
+            for (int i = mixY; i < maxY + 1; i++)
+            {
+                if(!HasTiles(new Coordinate(xIndex, i)))
+                    return false;
+            }
+            return true;
+        }
+    }
+
+    List<Coordinate> CheckLine(Coordinate pos1, Coordinate pos2, ColorCode colorCode)
+    {
+        List<Coordinate> toEliminateCoordinates = new List<Coordinate>();
+        bool isHorizontal = pos1.yIndex == pos2.yIndex;
+        if (isHorizontal)
+        {
+            int mixX = Mathf.Min(pos1.xIndex, pos2.xIndex);
+            int maxX = Mathf.Max(pos1.xIndex, pos2.xIndex);
+            int yIndex = pos1.yIndex; // Assuming both have the same Y index for horizontal check
+            for (int i = mixX; i < maxX + 1; i++)
+            {
+                if(HasBlockOnTile(new Coordinate(i, yIndex), colorCode))
+                {
+                    toEliminateCoordinates.Add(new Coordinate(i, yIndex));
+                }
+                else
+                {
+                    toEliminateCoordinates.Clear();
+                    break;
+                }
+            }
+        }
+        else
+        {
+            int mixY = Mathf.Min(pos1.yIndex, pos2.yIndex);
+            int maxY = Mathf.Max(pos1.yIndex, pos2.yIndex);
+            int xIndex = pos1.xIndex; // Assuming both have the same X index for vertical check
+            for (int i = mixY; i < maxY + 1; i++)
+            {
+                if(HasBlockOnTile(new Coordinate(xIndex, i), colorCode))
+                {
+                    toEliminateCoordinates.Add(new Coordinate(xIndex, i));
+                }
+                else
+                {
+                    toEliminateCoordinates.Clear();
+                    break;
+                }
+            }
+        }
+        return toEliminateCoordinates;
+    }
+
+    void EliminateBlockCoordinate()
+    {
+        for (var i = 0; i < eliminateLines.Count; i++)
+        {
+            for (var i1 = 0; i1 < eliminateLines[i].toEliminateCoordinates.Count; i1++)
+            {
+                EliminateBlockCoordinate(eliminateLines[i].toEliminateCoordinates[i1]);
+            }
+        }
+    }
+    void EliminateBlockCoordinate(Coordinate coordinate)
+    {
+        for (var i = 0; i < blocks.Count; i++)
+        {
+            blocks[i].EliminateBlockCoordinate(coordinate);
+        }
     }
     
-    
-
+    void EliminateBlock()
+    {
+        for (var i = 0; i < blocks.Count; i++)
+        {
+            blocks[i].EliminateBlock();
+        }
+    }
     #endregion
     
 }
@@ -270,6 +401,27 @@ public class Coordinate
     {
         xIndex = x;
         yIndex = y;
+    }
+    
+    public Coordinate(Coordinate coordinate)
+    {
+        xIndex = coordinate.xIndex;
+        yIndex = coordinate.yIndex;
+    }
+
+    public void LogInfo()
+    {
+        Debug.Log($"Coordinate: ({xIndex}, {yIndex})");
+    }
+}
+
+[System.Serializable]
+public class EliminateLine
+{
+    public List<Coordinate> toEliminateCoordinates = new List<Coordinate>();
+    public EliminateLine(List<Coordinate> coordinates)
+    {
+        toEliminateCoordinates = coordinates;
     }
 }
 

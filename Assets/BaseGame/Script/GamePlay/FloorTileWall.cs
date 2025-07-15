@@ -14,6 +14,8 @@ public class FloorTileWall : MonoBehaviour
     public GameObject wallObj;
     public GameObject gateObj;
     public BaseGate gate;
+    public GameObject leftBorder;
+    public GameObject rightBorder;
     
     [Button]
     public void SetTouchDirection(TouchDirection direction)
@@ -60,6 +62,26 @@ public class FloorTileWall : MonoBehaviour
                 gateObj.SetActive(false);
                 floorTile.mapConstructor.RemoveGate(gate);
                 break;
+        }
+    }
+
+    public void CheckBorder()
+    {
+        if (touchDirection == TouchDirection.Up || touchDirection == TouchDirection.Down)
+        {
+            bool hasLeftWall = floorTile.CheckHasWall(TouchDirection.Left);
+            bool hasRightWall = floorTile.CheckHasWall(TouchDirection.Right);
+
+            if (touchDirection == TouchDirection.Up)
+            {
+                if (hasLeftWall) rightBorder.SetActive(true);
+                if (hasRightWall) leftBorder.SetActive(true);
+            }
+            else // touchDirection == TouchDirection.Down
+            {
+                if (hasLeftWall) leftBorder.SetActive(true);
+                if (hasRightWall) rightBorder.SetActive(true);
+            }
         }
     }
 }
