@@ -9,6 +9,9 @@ public class BaseGate : MonoBehaviour
     [OnValueChanged("OnChangeColorCode")]
     public ColorCode colorCode;
     public MeshFilter meshRenderer;
+    public MeshRenderer meshRendererR;
+    public Material baseMaterial;
+    public Material lightMaterial;
 
     public void OnChangeColorCode()
     {
@@ -28,4 +31,17 @@ public class BaseGate : MonoBehaviour
         floorTileWall.SwitchWallType(WallType.Wall);
     }
     
+    public void SetHighlighted(bool isHighlighted)
+    {
+        if (meshRendererR == null)
+            return;
+        if (isHighlighted)
+        {
+            meshRendererR.material = lightMaterial;
+        }
+        else
+        {
+            meshRendererR.material = baseMaterial;
+        }
+    }
 }

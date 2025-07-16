@@ -14,6 +14,8 @@ public class ColorGlobalConfig : GlobalConfig<ColorGlobalConfig>
     public BaseBlock baseBlockPrefab;
     public PhysicMaterial blockPhysicMaterial;
     public IceCounter iceCounterPrefab;
+    public CombinedBlock combinedBlockPrefab;
+    public List<TestMap> TestMaps;
 
     [Button]
     public void FetchColor()
@@ -143,12 +145,25 @@ public class ColorGlobalConfig : GlobalConfig<ColorGlobalConfig>
         return match == blockShapeData.blockCoordinates.Count 
                && coordinates.Count == blockShapeData.blockCoordinates.Count;
     }
+    
+    public Color GetOutlineColor(ColorCode colorCode)
+    {
+        // foreach (BlockColorConfig config in blockColorConfigs)
+        // {
+        //     if (config.colorCode == colorCode)
+        //     {
+        //         return config.outLineColor;
+        //     }
+        // }
+        return Color.white; // Default color if not found
+    }
 }
 
 [System.Serializable]
 public class BlockColorConfig
 {
     public ColorCode colorCode;
+    public Color outLineColor;
     [PreviewField] public Material blockMaterial;
     [PreviewField] public Material grainMaterial;
     [PreviewField] public GameObject blockAll;
@@ -164,6 +179,11 @@ public class BlockShapeData
     public Vector3 blockPos;
     public Vector3 blockAngle;
     public Vector3 blockScale = new Vector3(1,1,1);
+}
+
+[System.Serializable]
+public class TestMap {
+    public List<Coordinate> tileCoordinates;
 }
 
 public enum ColorCode

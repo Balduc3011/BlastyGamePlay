@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
@@ -8,6 +9,8 @@ using UnityEditor;
 
 public class MapConstructor : MonoBehaviour
 {
+    public Camera camera; // Base Size = 6.5f for 6 grid
+    public Transform groundTrs; // Base Scale = 1 for 6 grid
     public FloorTile floorTilePrefab;
     public Transform tileParent;
     public List<FloorTile> floorTiles;
@@ -19,9 +22,22 @@ public class MapConstructor : MonoBehaviour
     public float xDelta = 0;
     public float yDelta = 0;
 
+    public Transform blocksParent;
     public List<BaseBlock> blocks;
     public List<EliminateLine> eliminateLines;
+    
+    public Coordinate lastCheckCoordinate;
 
+    private void Start()
+    {
+        Init();
+    }
+
+    public void Init()
+    {
+        CollectBlock();
+    }
+    
     #region InitMap
 
     public void SetCoordinates()
@@ -67,6 +83,21 @@ public class MapConstructor : MonoBehaviour
             tile.mapConstructor = this;
             SetTileIndex(tile, coordinate.xIndex, coordinate.yIndex);
             tile.SetTouchDirections(GetTouchDirections(new Coordinate(coordinate.xIndex, coordinate.yIndex)));
+        }
+        SetScale();
+    }
+
+    void SetScale()
+    {
+        var size = GetMapSize();
+        float maxSize = (size.xIndex + size.yIndex) / 2f + 1;
+        if(camera != null)
+        {
+            camera.orthographicSize = 6.5f * (maxSize / 6f);
+        }
+        if (groundTrs != null)
+        {
+            groundTrs.localScale = new Vector3(maxSize / 6f, 1, maxSize / 6f);
         }
     }
 
@@ -215,10 +246,62 @@ public class MapConstructor : MonoBehaviour
             blocks.Remove(block);
         }
     }
+
+    public void CollectBlock()
+    {
+        // Get all children of blocksParent check if it is BaseBlock and add to blocks list if not already present
+        blocks.Clear();
+        for (var i = 0; i < blocksParent.childCount; i++)
+        {
+            var child = blocksParent.GetChild(i);
+            BaseBlock block = child.GetComponent<BaseBlock>();
+            if (block != null && !blocks.Contains(block))
+            {
+                blocks.Add(block);
+            }
+        }
+    }
     #endregion
 
     #region GamePlay
 
+    public bool CheckLastCheckCoordinate(Vector3 position, out Coordinate coordinate)
+    {
+        Coordinate checkCoordinate = new Coordinate(0, 0);
+        float minDistance = float.MaxValue;
+        for (var i = 0; i < tileCoordinates.Count; i++)
+        {
+            var tile = tileCoordinates[i];
+            Vector3 tilePosition = new Vector3(tile.xIndex + xDelta, 0, tile.yIndex + yDelta);
+            float distance = Vector3.Distance(position, tilePosition);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                checkCoordinate = tile;
+            }
+        }
+        if (lastCheckCoordinate != null )
+        {
+            if ((lastCheckCoordinate.xIndex != checkCoordinate.xIndex || lastCheckCoordinate.yIndex != checkCoordinate.yIndex))
+            {
+                lastCheckCoordinate.xIndex = checkCoordinate.xIndex;
+                lastCheckCoordinate.yIndex = checkCoordinate.yIndex;
+                coordinate = new Coordinate(checkCoordinate);
+                return true;
+            }
+        }
+        else
+        {
+            lastCheckCoordinate = new Coordinate(checkCoordinate);
+            lastCheckCoordinate.xIndex = checkCoordinate.xIndex;
+            lastCheckCoordinate.yIndex = checkCoordinate.yIndex;
+            coordinate = new Coordinate(checkCoordinate);
+            return true;
+        }
+        coordinate = new Coordinate(checkCoordinate);
+        return false;
+    }
+    
     public Vector3 GetNearestCordinate(Vector3 position, out Coordinate coordinate)
     {
         coordinate = new Coordinate(0, 0);
@@ -414,6 +497,63 @@ public class MapConstructor : MonoBehaviour
             }
         }
     }
+
+    public void CheckHighLightBlock()
+    {
+        CheckBlockEliminate();
+        CheckEliminableBlock();
+        HighLightLine();
+    }
+
+    public void CheckEliminableBlock()
+    {
+        for (var i = 0; i < eliminateLines.Count; i++)
+        {
+            for (var i1 = 0; i1 < eliminateLines[i].toEliminateCoordinates.Count; i1++)
+            {
+                var block = CheckEliminableCoordinate(eliminateLines[i].toEliminateCoordinates[i1]);
+                if(block != null && !eliminateLines[i].toEliminateBlocks.Contains(block))
+                {
+                    eliminateLines[i].toEliminateBlocks.Add(block);
+                }
+            }
+        }
+    }
+    BaseBlock CheckEliminableCoordinate(Coordinate coordinate)
+    {
+        for (var i = 0; i < blocks.Count; i++)
+        {
+            if (blocks[i].CheckHasAbsoluteCoordinate(coordinate))
+                return blocks[i];
+        }
+        return null;
+    }
+    
+    void HighLightLine()
+    {
+        List<BaseGate> highlightedGates = new List<BaseGate>();
+        List<BaseBlock> highlightedBlocks = new List<BaseBlock>();
+        for (var i = 0; i < eliminateLines.Count; i++)
+        {
+            for (var i1 = 0; i1 < eliminateLines[i].toEliminateGates.Count; i1++)
+            {
+                highlightedGates.Add(eliminateLines[i].toEliminateGates[i1]);
+            }
+            for (var i1 = 0; i1 < eliminateLines[i].toEliminateBlocks.Count; i1++)
+            {
+                highlightedBlocks.Add(eliminateLines[i].toEliminateBlocks[i1]);
+            }
+        }
+
+        for (int i = 0; i < gates.Count; i++)
+        {
+            gates[i].SetHighlighted(highlightedGates.Contains(gates[i]));
+        }
+        for (var i = 0; i < blocks.Count; i++)
+        {
+            blocks[i].SetHighlighted(highlightedBlocks.Contains(blocks[i]));
+        }
+    }
     #endregion
     
 }
@@ -446,6 +586,7 @@ public class EliminateLine
 {
     public List<BaseGate> toEliminateGates = new List<BaseGate>();
     public List<Coordinate> toEliminateCoordinates = new List<Coordinate>();
+    public List<BaseBlock> toEliminateBlocks = new List<BaseBlock>();
     public EliminateLine(List<Coordinate> coordinates)
     {
         toEliminateCoordinates = coordinates;

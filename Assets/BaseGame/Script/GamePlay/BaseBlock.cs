@@ -13,8 +13,8 @@ public class BaseBlock : MonoBehaviour
     [OnValueChanged("OnChangeShape")]
     public BlockShape blockShape;
     public MoveDirection moveDirection;
-    [OnValueChanged("ActiveIced")]
-    public bool isIced;
+    
+    
     public MapConstructor mapConstructor;
     [HideInInspector] public List<BoxCollider> colliders;
     public Coordinate coordinate;
@@ -22,6 +22,7 @@ public class BaseBlock : MonoBehaviour
     public List<Coordinate> blockAbsoluteCoordinates;
     [HideInInspector] public IndexShow indexShowPrefab;
     [HideInInspector] public List<IndexShow> indexShows;
+    public Outline outline;
     public Transform blockModel;
     [HideInInspector] public Vector3 clickPosition;
     [HideInInspector] public Vector3 clickDelta;
@@ -31,13 +32,28 @@ public class BaseBlock : MonoBehaviour
     [HideInInspector] Vector3 lastClickPos = Vector3.zero;
     [HideInInspector] public List<Transform> blockChild;
     public Transform blockParent;
-    [HideInInspector] public Transform blockBase;
+    public Transform blockBase;
     [HideInInspector] public bool markedToEliminate = false;
     [HideInInspector] public List<ChildBlock> childBlocks;
     [HideInInspector] public List<int> checkedCoordinate = new List<int>();
+    private float blockModelY = 0;
+    public MeshRenderer selectedMeshRenderer;
+    Material[] baseMaterials = new Material[2];
+    Material[] lightMaterials = new Material[2];
+    public Material lightMaterial;
+    Coordinate lastCheckCoordinate;
+    bool pickingUp = false;
+    bool isHighlighted = false;
     // SpecialBlock
     
-    public IceBlock iceBlock;
+    [OnValueChanged("ActiveIced")]
+    public bool isIced;
+    [ShowIf("isIced")] public IceBlock iceBlock;
+    [OnValueChanged("ActiveCombined")]
+    public bool isCombined;
+    [ShowIf("isCombined")] public List<CombinedBlock> combinedBlocks;
+    [ShowIf("isCombined")] public BaseBlock combinedTarget;
+    
     private void Start()
     {
         InitFirstValue();
@@ -48,7 +64,10 @@ public class BaseBlock : MonoBehaviour
         transform.position = mapConstructor.GetNearestCordinate(transform.position, out coordinate);
         rigidbody.velocity = Vector3.zero;
         rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        blockModelY = blockModel.localPosition.y;
+        outline.enabled = false;
         SetBlockNewPos();
+        InitMaterial();
     }
     
 
@@ -117,13 +136,14 @@ public class BaseBlock : MonoBehaviour
     {
         ClearBlock();
         GameObject go = ColorGlobalConfig.Instance.GetBlockAll(colorCode);
+        outline.OutlineColor = ColorGlobalConfig.Instance.GetOutlineColor(colorCode);
         if (go != null)
         {
             GameObject newSpawn = (GameObject)PrefabUtility.InstantiatePrefab(go);
             blockBase = newSpawn.transform;
             blockBase.SetParent(blockParent);
             blockBase.localPosition = Vector3.zero;
-            blockChild = GetListTransformsByName(blockBase, "Block_");
+            blockChild = GetListTransformsByName(blockBase, "Block", "BlockModel");
         }
         OnChangeShape();
     }
@@ -134,7 +154,7 @@ public class BaseBlock : MonoBehaviour
         if(blockBase != null)
             DestroyImmediate(blockBase.gameObject);
     }
-
+    [Button]
     public void OnChangeShape()
     {
         BlockShapeData blockShapeData = ColorGlobalConfig.Instance.GetBlockShapeData(blockShape);
@@ -157,6 +177,7 @@ public class BaseBlock : MonoBehaviour
             selectedBlock.localScale = blockShapeData.blockScale;
             blockCoordinates = new List<Coordinate>();
             blockCoordinates.AddRange(blockShapeData.blockCoordinates);
+            selectedMeshRenderer = selectedBlock.GetComponent<MeshRenderer>();
         }
         CheckIndexShow(blockShapeData.blockCoordinates);
         InitCollider();
@@ -182,13 +203,34 @@ public class BaseBlock : MonoBehaviour
         }
     }
 
-    public List<Transform> GetListTransformsByName(Transform parent, string nameContains)
+    void InitMaterial()
+    {
+        if(selectedMeshRenderer == null)
+            return;
+        baseMaterials = selectedMeshRenderer.materials;
+        lightMaterials = new Material[2];
+        for (var i = 0; i < baseMaterials.Length; i++)
+        {
+            if (baseMaterials[i].name == "M_Color"
+                || baseMaterials[i].name == "M_Color (Instance)")
+            {
+                lightMaterials[i] = lightMaterial;
+            }
+            else
+            {
+                lightMaterials[i] = baseMaterials[i];
+            }
+        }
+    }
+
+    public List<Transform> GetListTransformsByName(Transform parent, string nameContains, string negative)
     {
         List<Transform> matchingTransforms = new List<Transform>();
         Transform[] allTransforms = parent.GetComponentsInChildren<Transform>();
 
         foreach (Transform child in allTransforms)
         {
+            Debug.Log(child.name);
             if (child.name.Contains(nameContains))
             {
                 matchingTransforms.Add(child);
@@ -217,6 +259,11 @@ public class BaseBlock : MonoBehaviour
             }
         }
     }
+
+    void ActiveCombined()
+    {
+        
+    }
     
     #endregion
 
@@ -226,34 +273,62 @@ public class BaseBlock : MonoBehaviour
     {
         this.clickPosition = clickPosition;
         clickDelta = clickPosition - transform.position;
-        blockModel.localPosition = Vector3.up * 0.7f;
+        blockModel.localPosition = Vector3.up * (blockModelY + 0.2f);
         mapConstructor.SetSelectedBlock(this);
         SetBGBlock(false);
+        pickingUp = true;
+        outline.enabled = pickingUp;
     }
     
     public void OnBlockDeselected()
     {
-        blockModel.localPosition = Vector3.up * 0.5f;
+        blockModel.localPosition = Vector3.up * blockModelY;
         SetBlockNewPos();
         mapConstructor.DeSelectBlock();
         rigidbody.velocity = Vector3.zero;
         SetBGBlock(true);
+        pickingUp = false;
+        outline.enabled = pickingUp;
     }
 
+    public void SetHighlighted(bool isHighlighted)
+    {
+        if (selectedMeshRenderer == null)
+            return;
+        if (isHighlighted && !this.isHighlighted)
+        {
+            outline.enabled = false;
+            selectedMeshRenderer.materials = lightMaterials;
+        }
+        else if(!isHighlighted && this.isHighlighted)
+        {
+            outline.enabled = false;
+            selectedMeshRenderer.materials = baseMaterials;
+        }
+        this.isHighlighted = isHighlighted;
+        outline.enabled = pickingUp;
+    }
+    
     void SetBlockNewPos()
     {
         transform.position = mapConstructor.GetNearestCordinate(transform.position, out coordinate);
+        if(lastCheckCoordinate == null)
+            lastCheckCoordinate = new Coordinate(coordinate.xIndex, coordinate.yIndex);
+        lastCheckCoordinate.xIndex = coordinate.xIndex;
+        lastCheckCoordinate.yIndex = coordinate.yIndex;
         SetWorldCoordinate();
     }
 
-    void SetWorldCoordinate()
+    void SetWorldCoordinate(Coordinate sample = null)
     {
+        if(sample == null)
+            sample = new Coordinate(coordinate.xIndex, coordinate.yIndex);
         for (int i = 0; i < blockCoordinates.Count; i++)
         {
             if(i >= blockAbsoluteCoordinates.Count) 
                 blockAbsoluteCoordinates.Add(new Coordinate(0, 0));
-            blockAbsoluteCoordinates[i].xIndex = blockCoordinates[i].xIndex + coordinate.xIndex;
-            blockAbsoluteCoordinates[i].yIndex = blockCoordinates[i].yIndex + coordinate.yIndex;
+            blockAbsoluteCoordinates[i].xIndex = blockCoordinates[i].xIndex + sample.xIndex;
+            blockAbsoluteCoordinates[i].yIndex = blockCoordinates[i].yIndex + sample.yIndex;
         }
     }
 
@@ -308,6 +383,23 @@ public class BaseBlock : MonoBehaviour
                 rigidbody.velocity = Vector3.zero;
             }
             velocityQueue.Clear();
+            CheckHighLightBlock();
+        }
+    }
+
+    void CheckHighLightBlock()
+    {
+        Coordinate checkCoordinate;
+        if (mapConstructor.CheckLastCheckCoordinate(transform.position, out checkCoordinate))
+        {
+            if(checkCoordinate.xIndex != lastCheckCoordinate.xIndex || 
+               checkCoordinate.yIndex != lastCheckCoordinate.yIndex)
+            {
+                lastCheckCoordinate.xIndex = checkCoordinate.xIndex;
+                lastCheckCoordinate.yIndex = checkCoordinate.yIndex;
+                SetWorldCoordinate(checkCoordinate);
+                mapConstructor.CheckHighLightBlock();
+            }
         }
     }
 
@@ -355,6 +447,19 @@ public class BaseBlock : MonoBehaviour
                 break;
             }
         }
+    }
+    
+    public bool CheckHasAbsoluteCoordinate(Coordinate coordinate)
+    {
+        for (var i = 0; i < blockAbsoluteCoordinates.Count; i++)
+        {
+            if(blockAbsoluteCoordinates[i].xIndex == coordinate.xIndex && 
+               blockAbsoluteCoordinates[i].yIndex == coordinate.yIndex)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void EliminateBlock()
