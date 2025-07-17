@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -462,11 +463,20 @@ public class MapConstructor : MonoBehaviour
 
     void EliminateBlockCoordinate()
     {
+        var size = GetMapSize();
+        xDelta = (float)-size.xIndex / 2;
+        yDelta = (float)-size.yIndex / 2;
         for (var i = 0; i < eliminateLines.Count; i++)
         {
+            float avg = (float)eliminateLines[i].toEliminateCoordinates.Count / 2;
             for (var i1 = 0; i1 < eliminateLines[i].toEliminateCoordinates.Count; i1++)
             {
                 EliminateBlockCoordinate(eliminateLines[i].toEliminateCoordinates[i1]);
+                ExploseBlock exploseBlock = Instantiate(ColorGlobalConfig.Instance.exploseBlockPrefab, blocksParent);
+                eliminateLines[i].toExplodeBlocks.Add(exploseBlock);
+                exploseBlock.coordinate = new Coordinate(eliminateLines[i].toEliminateCoordinates[i1]);
+                exploseBlock.transform.position = new Vector3(exploseBlock.coordinate.xIndex + xDelta, 0, exploseBlock.coordinate.yIndex + yDelta);
+                exploseBlock.Init(eliminateLines[i].toEliminateGates[0].colorCode, Mathf.Abs(avg - i1) + 1);
             }
         }
     }
@@ -486,9 +496,13 @@ public class MapConstructor : MonoBehaviour
         }
         for (var i = 0; i < eliminateLines.Count; i++)
         {
+            Coordinate gate1 = eliminateLines[i].toEliminateGates[0].floorTileWall.floorTile.coordinate;
+            Coordinate gate2 = eliminateLines[i].toEliminateGates[1].floorTileWall.floorTile.coordinate;
+            float delay = Mathf.Abs((gate1.xIndex - gate2.xIndex) + (gate1.yIndex - gate2.yIndex)) + 1;
+            delay = (delay * 0.1f / 2f) + 0.15f;
             for (var i1 = 0; i1 < eliminateLines[i].toEliminateGates.Count; i1++)
             {
-                eliminateLines[i].toEliminateGates[i1].EliminateGate();
+                eliminateLines[i].toEliminateGates[i1].EliminateGate(delay);
             }
 
             for (var i1 = 0; i1 < blocks.Count; i1++)
@@ -587,6 +601,7 @@ public class EliminateLine
     public List<BaseGate> toEliminateGates = new List<BaseGate>();
     public List<Coordinate> toEliminateCoordinates = new List<Coordinate>();
     public List<BaseBlock> toEliminateBlocks = new List<BaseBlock>();
+    public List<ExploseBlock> toExplodeBlocks = new List<ExploseBlock>();
     public EliminateLine(List<Coordinate> coordinates)
     {
         toEliminateCoordinates = coordinates;

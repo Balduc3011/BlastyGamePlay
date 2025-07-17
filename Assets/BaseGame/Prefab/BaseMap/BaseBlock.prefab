@@ -217,11 +217,7 @@ MonoBehaviour:
   coordinate:
     xIndex: 0
     yIndex: 0
-  blockCoordinates:
-  - xIndex: 0
-    yIndex: 0
-  - xIndex: 1
-    yIndex: 0
+  blockCoordinates: []
   blockAbsoluteCoordinates: []
   indexShowPrefab: {fileID: 2773190514196034242}
   indexShows: []
@@ -240,13 +236,16 @@ MonoBehaviour:
   selectedMeshRenderer: {fileID: 0}
   lightMaterial: {fileID: 2100000, guid: 2f3cc03e488fa6d468d733089466c30b, type: 2}
   isResolved: 0
+  arrowBase: {fileID: 0}
+  arrows: []
   isIced: 0
   iceBlock: {fileID: 0}
-  isCombined: 0
+  <isCombined>k__BackingField: 0
   combinedBlockParent: {fileID: 8801415850674290479}
   combinedBlocks: []
   combinedTargets: []
   realCombinedTargets: []
+  combineJoints: []
 --- !u!65 &3709871554095886285
 BoxCollider:
   m_ObjectHideFlags: 0

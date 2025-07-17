@@ -401,9 +401,11 @@ MonoBehaviour:
     blockAngle: {x: 0, y: 0, z: 0}
     blockScale: {x: 1, y: 1, z: 1}
   baseBlockPrefab: {fileID: 3505284298109111521, guid: 3ef22bb9aa3c7b848b0d37d0e311124b, type: 3}
+  exploseBlockPrefab: {fileID: 3744308615771569430, guid: 7d99068ce5b5da14fb500fe37ab6c305, type: 3}
   blockPhysicMaterial: {fileID: 13400000, guid: 589e1261325bfb54d8b4e9b04b4ee4ff, type: 2}
   iceCounterPrefab: {fileID: 1993043985306763567, guid: a8adf10c33745f2458221d3abc40316a, type: 3}
   combinedBlockPrefab: {fileID: 8813651341142041312, guid: 75ea8153ada82234a84461ca74c29a34, type: 3}
+  arrowBasePrefab: {fileID: 922644336757986069, guid: acead762dcb478744a39ff8192670737, type: 3}
   TestMaps:
   - tileCoordinates:
     - xIndex: 0

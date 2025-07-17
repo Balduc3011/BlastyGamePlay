@@ -13,6 +13,7 @@ public class BaseBlock : MonoBehaviour
     public ColorCode colorCode;
     [OnValueChanged("OnChangeShape")]
     public BlockShape blockShape;
+    [OnValueChanged("OnChangeMoveDirection")]
     public MoveDirection moveDirection;
     
     public MapConstructor mapConstructor;
@@ -38,15 +39,17 @@ public class BaseBlock : MonoBehaviour
     [HideInInspector] public List<int> checkedCoordinate = new List<int>();
     private float blockModelY = 0;
     public MeshRenderer selectedMeshRenderer;
-    Material[] baseMaterials = new Material[2];
-    Material[] lightMaterials = new Material[2];
+    [HideInInspector] public Material[] baseMaterials = new Material[2];
+    [HideInInspector] public Material[] lightMaterials = new Material[2];
     public Material lightMaterial;
     Coordinate lastCheckCoordinate;
     bool pickingUp = false;
     bool isHighlighted = false;
-    // SpecialBlock
-
     public bool isResolved;
+    // SpecialBlock
+    public Transform arrowBase;
+    public List<Transform> arrows;
+    
     [OnValueChanged("ActiveIced")]
     public bool isIced;
     [ShowIf("isIced")] public IceBlock iceBlock;
@@ -58,7 +61,7 @@ public class BaseBlock : MonoBehaviour
     [ShowIf("isCombined")] public List<BaseBlock> realCombinedTargets;
     [ShowIf("isCombined")] public List<FixedJoint> combineJoints;
     
-    private void Start()
+    public virtual void Start()
     {
         InitFirstValue();
         InitCombined();
@@ -106,18 +109,18 @@ public class BaseBlock : MonoBehaviour
 
     void CheckIndexShow(List<Coordinate> coordinates)
     {
-        foreach (var indexShow in indexShows)
-        {
-            indexShow.coordinateChecked = false;
-        }
-
-        for (var i = 0; i < indexShows.Count; i++)
-        {
-            for (var i1 = 0; i1 < coordinates.Count; i1++)
-            {
-                indexShows[i].CheckCoordinate(coordinates[i1]);
-            }
-        }
+        // foreach (var indexShow in indexShows)
+        // {
+        //     indexShow.coordinateChecked = false;
+        // }
+        //
+        // for (var i = 0; i < indexShows.Count; i++)
+        // {
+        //     for (var i1 = 0; i1 < coordinates.Count; i1++)
+        //     {
+        //         indexShows[i].CheckCoordinate(coordinates[i1]);
+        //     }
+        // }
     }
     
 
@@ -147,7 +150,8 @@ public class BaseBlock : MonoBehaviour
     {
         ClearBlock();
         GameObject go = ColorGlobalConfig.Instance.GetBlockAll(colorCode);
-        outline.OutlineColor = ColorGlobalConfig.Instance.GetOutlineColor(colorCode);
+        if(outline != null)
+            outline.OutlineColor = ColorGlobalConfig.Instance.GetOutlineColor(colorCode);
         if (go != null)
         {
             GameObject newSpawn = (GameObject)PrefabUtility.InstantiatePrefab(go);
@@ -205,8 +209,15 @@ public class BaseBlock : MonoBehaviour
                 colliders.Add(newCollider);
             }
             colliders[i].enabled = true;
-            colliders[i].size = new Vector3(0.9f, 1f, 0.9f);
-            colliders[i].center = new Vector3(blockCoordinates[i].xIndex, 0.5f, blockCoordinates[i].yIndex);
+            float xSize = 0.9f;
+            float ySize = 0.9f;
+            if (CheckHasLocalCoordinate(blockCoordinates[i].xIndex + 1, blockCoordinates[i].yIndex))
+                xSize = 1f;
+            if (CheckHasLocalCoordinate(blockCoordinates[i].xIndex, blockCoordinates[i].yIndex + 1))
+                ySize = 1f;
+            
+            colliders[i].size = new Vector3(xSize, 1f, ySize);
+            colliders[i].center = new Vector3(blockCoordinates[i].xIndex + (xSize == 1f ? 0.05f : 0f), 0.5f, blockCoordinates[i].yIndex + (ySize == 1f ? 0.05f : 0f));
         }
         for(int i = blockCoordinates.Count; i < colliders.Count; i++)
         {
@@ -214,7 +225,7 @@ public class BaseBlock : MonoBehaviour
         }
     }
 
-    void InitMaterial()
+    public void InitMaterial()
     {
         if(selectedMeshRenderer == null)
             return;
@@ -241,7 +252,6 @@ public class BaseBlock : MonoBehaviour
 
         foreach (Transform child in allTransforms)
         {
-            Debug.Log(child.name);
             if (child.name.Contains(nameContains))
             {
                 matchingTransforms.Add(child);
@@ -249,6 +259,151 @@ public class BaseBlock : MonoBehaviour
         }
         return matchingTransforms;
     }
+    
+    bool CheckHasLocalCoordinate(int x, int y)
+    {
+        for (var i = 0; i < blockCoordinates.Count; i++)
+        {
+            if (blockCoordinates[i].xIndex == x && 
+                blockCoordinates[i].yIndex == y)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    #region Arrow
+
+    void OnChangeMoveDirection()
+    {
+        if (moveDirection == MoveDirection.All)
+        {
+            if(arrowBase != null)
+                arrowBase.gameObject.SetActive(false);
+            return;
+        }
+        if (arrowBase == null)
+        {
+            arrowBase = Instantiate(ColorGlobalConfig.Instance.arrowBasePrefab, blockParent);
+            arrows = GetListTransformsByName(arrowBase, "Arrow_", "Negative");
+        }
+        arrowBase.localPosition = Vector3.zero;
+        arrowBase.gameObject.SetActive(true);
+        if(moveDirection == MoveDirection.Horizontal)
+        {
+            SetHorizontalArrow();
+        }
+        else if(moveDirection == MoveDirection.Vertical)
+        {
+            SetVerticalArrow();
+        }
+    }
+
+    void SetHorizontalArrow()
+    {
+        List<int> yIndexs = new List<int>();
+        int maxX = 0;
+        for (int i = 0; i < blockCoordinates.Count; i++)
+        {
+            if (!yIndexs.Contains(blockCoordinates[i].yIndex))
+                yIndexs.Add(blockCoordinates[i].yIndex);
+            if(blockCoordinates[i].xIndex > maxX)
+               maxX = blockCoordinates[i].xIndex;
+        }
+        int maxLenght = 0;
+        int selectedYIndex = 0;
+        int maxCount = 0;
+        for (int i = 0; i < yIndexs.Count; i++)
+        {
+            int curLenght = 0;
+            for (int j = 0; j < maxX + 1; j++)
+            {
+                if(CheckHasLocalCoordinate(j, yIndexs[i]))
+                {
+                    curLenght++;
+                }
+            }
+            if(curLenght >= maxLenght)
+            {
+                maxLenght = curLenght;
+                selectedYIndex = yIndexs[i];
+                maxCount++;
+            }
+        }
+        float yIndex = selectedYIndex;
+        if(maxCount == yIndexs.Count)
+        {
+            yIndex = (maxCount - 1) * 0.5f;
+        }
+        Transform toShowArrow = GetArrow(maxLenght);
+        toShowArrow.localEulerAngles = Vector3.up * 90;
+        toShowArrow.localPosition = new Vector3((maxLenght - 1) * 0.5f, 0, yIndex);
+    }
+
+    void SetVerticalArrow()
+    {
+        List<int> xIndexes = new List<int>();
+        int maxY = 0;
+
+        // Collect unique xIndexes and find the maximum yIndex
+        for (int i = 0; i < blockCoordinates.Count; i++)
+        {
+            if (!xIndexes.Contains(blockCoordinates[i].xIndex))
+                xIndexes.Add(blockCoordinates[i].xIndex);
+            if (blockCoordinates[i].yIndex > maxY)
+                maxY = blockCoordinates[i].yIndex;
+        }
+
+        int maxLength = 0;
+        int selectedXIndex = 0;
+        int maxCount = 0;
+        // Determine the xIndex with the longest vertical line
+        for (int i = 0; i < xIndexes.Count; i++)
+        {
+            int currentLength = 0;
+            for (int j = 0; j < maxY + 1; j++)
+            {
+                if (CheckHasLocalCoordinate(xIndexes[i], j))
+                {
+                    currentLength++;
+                }
+            }
+            if (currentLength >= maxLength)
+            {
+                maxLength = currentLength;
+                selectedXIndex = xIndexes[i];
+                maxCount++;
+            }
+        }
+        float xIndex = selectedXIndex;
+        if(maxCount == xIndexes.Count)
+        {
+            xIndex = (maxCount - 1) * 0.5f;
+        }
+        Transform toShowArrow = GetArrow(maxLength);
+        toShowArrow.localEulerAngles = Vector3.zero;
+        toShowArrow.localPosition = new Vector3(xIndex, 0, (maxLength - 1) * 0.5f);
+    }
+
+    Transform GetArrow(int lenght)
+    {
+        string name = $"Arrow_0{lenght}";
+        int index = 0;
+        for (int i = 0; i < arrows.Count; i++)
+        {
+            if(arrows[i].gameObject.name == name)
+            {
+                index = i;
+            }
+            arrows[i].gameObject.SetActive(arrows[i].gameObject.name == name);
+        }
+        return arrows[index];
+    }
+
+    #endregion
+
+    #region Ice
 
     void ActiveIced()
     {
@@ -270,6 +425,8 @@ public class BaseBlock : MonoBehaviour
             }
         }
     }
+
+    #endregion
 
     #region CombinedBlock
 
@@ -440,7 +597,8 @@ public class BaseBlock : MonoBehaviour
             if (combinedTargets[i] != null && combinedTargets[i] != this)
             {
                 combinedTargets[i].SetBGBlock(!pick);
-                combinedTargets[i].outline.enabled = pick;
+                if(combinedTargets[i].outline != null)
+                    combinedTargets[i].outline.enabled = pick;
                 if (!pick)
                 {
                     combinedTargets[i].rigidbody.velocity = Vector3.zero;
@@ -527,16 +685,19 @@ public class BaseBlock : MonoBehaviour
             return;
         if (isHighlighted && !this.isHighlighted)
         {
-            outline.enabled = false;
+            if(outline != null)
+                outline.enabled = false;
             selectedMeshRenderer.materials = lightMaterials;
         }
         else if(!isHighlighted && this.isHighlighted)
         {
-            outline.enabled = false;
+            if(outline != null)
+                outline.enabled = false;
             selectedMeshRenderer.materials = baseMaterials;
         }
         this.isHighlighted = isHighlighted;
-        outline.enabled = pickingUp;
+        if(outline != null)
+            outline.enabled = pickingUp;
     }
     
     void SetBlockNewPos()
@@ -599,7 +760,7 @@ public class BaseBlock : MonoBehaviour
         return velocity;
     }
 
-    private void FixedUpdate()
+    public virtual void FixedUpdate()
     {
         if (velocityQueue != null)
         {
@@ -640,14 +801,16 @@ public class BaseBlock : MonoBehaviour
             rigidbody.isKinematic = false;
             rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
             pickingUp = true;
-            outline.enabled = pickingUp;
+            if(outline != null)
+                outline.enabled = pickingUp;
         }
         else
         {
             rigidbody.isKinematic = true;
             rigidbody.constraints = RigidbodyConstraints.FreezeAll;
             pickingUp = false;
-            outline.enabled = pickingUp;
+            if(outline != null)
+                outline.enabled = pickingUp;
         }
     }
     

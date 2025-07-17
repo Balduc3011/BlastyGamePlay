@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -26,7 +27,12 @@ public class BaseGate : MonoBehaviour
         }
     }
 
-    public void EliminateGate()
+    public void EliminateGate(float delay)
+    {
+        DOVirtual.DelayedCall(delay, EliminateGate);
+    }
+
+    void EliminateGate()
     {
         floorTileWall.SwitchWallType(WallType.Wall);
     }

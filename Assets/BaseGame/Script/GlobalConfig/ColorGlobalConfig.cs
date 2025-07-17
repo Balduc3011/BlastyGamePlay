@@ -12,9 +12,11 @@ public class ColorGlobalConfig : GlobalConfig<ColorGlobalConfig>
     public List<BlockColorConfig> blockColorConfigs;
     public List<BlockShapeData> blockShapeDatas;
     public BaseBlock baseBlockPrefab;
+    public ExploseBlock exploseBlockPrefab;
     public PhysicMaterial blockPhysicMaterial;
     public IceCounter iceCounterPrefab;
     public CombinedBlock combinedBlockPrefab;
+    public Transform arrowBasePrefab;
     public List<TestMap> TestMaps;
 
     [Button]
