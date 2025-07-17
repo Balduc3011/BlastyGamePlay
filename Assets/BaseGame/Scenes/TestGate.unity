@@ -7613,7 +7613,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1881948602508868162, guid: 3ef22bb9aa3c7b848b0d37d0e311124b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.5
+      value: -0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1881948602508868162, guid: 3ef22bb9aa3c7b848b0d37d0e311124b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -11792,6 +11792,7 @@ MonoBehaviour:
   ySize: 10
   xDelta: -2.5
   yDelta: -4.5
+  blocksParent: {fileID: 2125205213}
   blocks:
   - {fileID: 1922698058}
   - {fileID: 412257}
@@ -11981,7 +11982,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1881948602508868162, guid: 3ef22bb9aa3c7b848b0d37d0e311124b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.5
+      value: -1.5
       objectReference: {fileID: 0}
     - target: {fileID: 1881948602508868162, guid: 3ef22bb9aa3c7b848b0d37d0e311124b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -12083,6 +12084,26 @@ PrefabInstance:
       propertyPath: blockChild.Array.data[9]
       value: 
       objectReference: {fileID: 1193649582}
+    - target: {fileID: 3505284298109111521, guid: 3ef22bb9aa3c7b848b0d37d0e311124b, type: 3}
+      propertyPath: combinedTargets.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3505284298109111521, guid: 3ef22bb9aa3c7b848b0d37d0e311124b, type: 3}
+      propertyPath: <isCombined>k__BackingField
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3505284298109111521, guid: 3ef22bb9aa3c7b848b0d37d0e311124b, type: 3}
+      propertyPath: combinedTargets.Array.data[0]
+      value: 
+      objectReference: {fileID: 1053073682}
+    - target: {fileID: 3505284298109111521, guid: 3ef22bb9aa3c7b848b0d37d0e311124b, type: 3}
+      propertyPath: combinedTargets.Array.data[1]
+      value: 
+      objectReference: {fileID: 1969969112}
+    - target: {fileID: 3505284298109111521, guid: 3ef22bb9aa3c7b848b0d37d0e311124b, type: 3}
+      propertyPath: <isCombinedInited>k__BackingField
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3633957146825868475, guid: 3ef22bb9aa3c7b848b0d37d0e311124b, type: 3}
       propertyPath: m_Name
       value: BaseBlock (6)

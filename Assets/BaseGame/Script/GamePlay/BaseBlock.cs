@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
@@ -13,7 +14,6 @@ public class BaseBlock : MonoBehaviour
     [OnValueChanged("OnChangeShape")]
     public BlockShape blockShape;
     public MoveDirection moveDirection;
-    
     
     public MapConstructor mapConstructor;
     [HideInInspector] public List<BoxCollider> colliders;
@@ -45,18 +45,23 @@ public class BaseBlock : MonoBehaviour
     bool pickingUp = false;
     bool isHighlighted = false;
     // SpecialBlock
-    
+
+    public bool isResolved;
     [OnValueChanged("ActiveIced")]
     public bool isIced;
     [ShowIf("isIced")] public IceBlock iceBlock;
-    [OnValueChanged("ActiveCombined")]
-    public bool isCombined;
+    
+    [field:SerializeField] public bool isCombined { get; set; }
+    [ShowIf("isCombined")] public Transform combinedBlockParent;
     [ShowIf("isCombined")] public List<CombinedBlock> combinedBlocks;
-    [ShowIf("isCombined")] public BaseBlock combinedTarget;
+    [ShowIf("isCombined")] public List<BaseBlock> combinedTargets;
+    [ShowIf("isCombined")] public List<BaseBlock> realCombinedTargets;
+    [ShowIf("isCombined")] public List<FixedJoint> combineJoints;
     
     private void Start()
     {
         InitFirstValue();
+        InitCombined();
     }
 
     void InitFirstValue()
@@ -131,6 +136,12 @@ public class BaseBlock : MonoBehaviour
         // {
         //     meshRenderer.material = ColorGlobalConfig.Instance.GetBlockMaterial(relativeColor);
         // }
+    }
+
+    public void InitCoordinate()
+    {
+        SetBlockNewPos();
+        SetWorldCoordinate();
     }
     public void OnChangeColorCode()
     {
@@ -260,10 +271,231 @@ public class BaseBlock : MonoBehaviour
         }
     }
 
-    void ActiveCombined()
+    #region CombinedBlock
+
+    public void ActiveCombined()
     {
-        
+        isCombined = true;
     }
+    
+    public void AddCombinedTarget(BaseBlock block = null)
+    {
+        if (block != null && block != this)
+        {
+            if (combinedTargets == null)
+                combinedTargets = new List<BaseBlock>();
+            if (!combinedTargets.Contains(block))
+                combinedTargets.Add(block);
+        }
+    }
+    
+    public void RemoveCombinedTarget(BaseBlock block)
+    {
+        if (combinedTargets == null || !combinedTargets.Contains(block))
+            return;
+        combinedTargets.Remove(block);
+    }
+    
+    [Button]
+    public void InitCombined()
+    {
+        if (combinedTargets == null || !isCombined)
+            return;
+        for (var i = 0; i < combinedBlocks.Count; i++)
+        {
+            combinedBlocks[i].gameObject.SetActive(false);
+        }
+        for (int i = 0; i < combinedTargets.Count; i++)
+        {
+            CheckCombinedTarget(combinedTargets[i]);
+        }
+        CheckJoint();
+    }
+
+    void CheckJoint()
+    {
+        if(combineJoints == null)
+            combineJoints = new List<FixedJoint>();
+        for (int i = 0; i < realCombinedTargets.Count; i++)
+        {
+            if (i >= combineJoints.Count)
+            {
+                FixedJoint joint = gameObject.AddComponent<FixedJoint>();
+                combineJoints.Add(joint);
+            }
+        }
+
+        for (int i = combineJoints.Count - 1; i >= 0; i--)
+        {
+            if(i < realCombinedTargets.Count)
+            {
+                combineJoints[i].connectedBody = realCombinedTargets[i].rigidbody;
+                combineJoints[i].breakForce = 1000000f;
+                combineJoints[i].breakTorque = 1000000f;
+            }
+            else
+            {
+                Destroy(combineJoints[i]);
+                combineJoints.RemoveAt(i);
+            }
+        }
+    }
+    
+    void OnJointBreak(float breakForce)
+    {
+        Debug.Log($"Joint broke with force: {breakForce}");
+        // Recreate the joint if necessary
+        for (int i = 0; i < combineJoints.Count; i++)
+        {
+            if (combineJoints[i] == null || combineJoints[i].connectedBody == null)
+            {
+                FixedJoint newJoint = gameObject.AddComponent<FixedJoint>();
+                newJoint.connectedBody = combinedTargets[i].rigidbody;
+                newJoint.breakForce = 1000000f; // Set higher breakForce
+                newJoint.breakTorque = 1000000f; // Set higher breakTorque
+                combineJoints[i] = newJoint;
+            }
+        }
+    }
+    
+    void CheckCombinedTarget(BaseBlock target)
+    {
+        InitCoordinate();
+        CheckCombineBlock(target);
+        if (!target.isCombined)
+        {
+            target.AddCombinedTarget(this);
+            target.ActiveCombined();
+            for (int i = 0; i < combinedTargets.Count(); i++)
+            {
+                target.AddCombinedTarget(combinedTargets[i]);
+            }
+            target.InitCombined();
+        }
+    }
+
+    void CheckCombineBlock(BaseBlock target)
+    {
+        target.InitCoordinate();
+        for (int i = 0; i < blockAbsoluteCoordinates.Count; i++)
+        {
+            CheckCombinedCoordinate(blockAbsoluteCoordinates[i], target);
+        }
+    }
+
+    void CheckCombinedCoordinate(Coordinate root, BaseBlock target)
+    {
+        for (int x = -1; x <= 1 ; x++)
+        {
+            for (int y = -1; y <= 1 ; y++)
+            {
+                if (x == 0 && y == 0)
+                    continue;
+                if ((x == 0 && y != 0) || (x != 0 && y == 0))
+                {
+                    Coordinate checkCoordinate = new Coordinate(root.xIndex + x, root.yIndex + y);
+                    if (target.CheckHasAbsoluteCoordinate(checkCoordinate))
+                    {
+                        CombinedBlock combinedBlock = SpawmCombinedBlock();
+                        combinedBlock.Active(true);
+                        combinedBlock.SetAngle(x, y);
+                        int index = blockAbsoluteCoordinates.IndexOf(root);
+                        combinedBlock.transform.localPosition = new Vector3(blockCoordinates[index].xIndex, 0, blockCoordinates[index].yIndex);
+                        if (!realCombinedTargets.Contains(target))
+                        {
+                            realCombinedTargets.Add(target);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    CombinedBlock SpawmCombinedBlock()
+    {
+        if (combinedBlocks == null)
+            combinedBlocks = new List<CombinedBlock>();
+        for (var i = 0; i < combinedBlocks.Count; i++)
+        {
+            if (!combinedBlocks[i].gameObject.activeSelf)
+            {
+                combinedBlocks[i].gameObject.SetActive(true);
+                return combinedBlocks[i];
+            }
+        }
+        CombinedBlock combinedBlock = Instantiate(ColorGlobalConfig.Instance.combinedBlockPrefab, combinedBlockParent);
+        combinedBlock.baseBlock = this;
+        combinedBlock.gameObject.SetActive(true);
+        combinedBlock.transform.localPosition = transform.localPosition;
+        combinedBlocks.Add(combinedBlock);
+        return combinedBlock;
+    }
+    
+    void PickUpCombinedTargets(bool pick)
+    {
+        if (combinedTargets == null || combinedTargets.Count == 0)
+            return;
+        for (var i = 0; i < combinedTargets.Count; i++)
+        {
+            if (combinedTargets[i] != null && combinedTargets[i] != this)
+            {
+                combinedTargets[i].SetBGBlock(!pick);
+                combinedTargets[i].outline.enabled = pick;
+                if (!pick)
+                {
+                    combinedTargets[i].rigidbody.velocity = Vector3.zero;
+                    combinedTargets[i].SetBlockNewPos();
+                }
+            }
+        }
+    }
+
+    public void CallReCheckCombined()
+    {
+        for (var i = 0; i < combinedTargets.Count; i++)
+        {
+            combinedTargets[i].ReCheckCombined();   
+        }
+    }
+    
+    public void ReCheckCombined()
+    {
+        if (!isCombined || combinedTargets == null || combinedTargets.Count == 0)
+            return;
+        for (int i = combinedTargets.Count - 1; i >= 0; i--)
+        {
+            if (!realCombinedTargets.Contains(combinedTargets[i]))
+            {
+                bool hasConection = false;
+                for (var i1 = 0; i1 < realCombinedTargets.Count; i1++)
+                {
+                    if(realCombinedTargets[i1].realCombinedTargets.Contains(combinedTargets[i]))
+                    {
+                        hasConection = true;
+                        break;
+                    }
+                }
+                if (!hasConection)
+                {
+                    realCombinedTargets.Remove(combinedTargets[i]);
+                    RemoveCombinedTarget(combinedTargets[i]);
+                }
+            }
+            else
+            {
+                if (combinedTargets[i].isResolved)
+                {
+                    realCombinedTargets.Remove(combinedTargets[i]);
+                    RemoveCombinedTarget(combinedTargets[i]);
+                }
+            }
+            
+        }
+
+        InitCombined();
+    }
+
+    #endregion
     
     #endregion
 
@@ -276,8 +508,7 @@ public class BaseBlock : MonoBehaviour
         blockModel.localPosition = Vector3.up * (blockModelY + 0.2f);
         mapConstructor.SetSelectedBlock(this);
         SetBGBlock(false);
-        pickingUp = true;
-        outline.enabled = pickingUp;
+        PickUpCombinedTargets(true);
     }
     
     public void OnBlockDeselected()
@@ -287,8 +518,7 @@ public class BaseBlock : MonoBehaviour
         mapConstructor.DeSelectBlock();
         rigidbody.velocity = Vector3.zero;
         SetBGBlock(true);
-        pickingUp = false;
-        outline.enabled = pickingUp;
+        PickUpCombinedTargets(false);
     }
 
     public void SetHighlighted(bool isHighlighted)
@@ -409,11 +639,15 @@ public class BaseBlock : MonoBehaviour
         {
             rigidbody.isKinematic = false;
             rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
+            pickingUp = true;
+            outline.enabled = pickingUp;
         }
         else
         {
             rigidbody.isKinematic = true;
             rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+            pickingUp = false;
+            outline.enabled = pickingUp;
         }
     }
     
@@ -466,8 +700,11 @@ public class BaseBlock : MonoBehaviour
     {
         if(!markedToEliminate)
             return;
+        isResolved = true;
+        CallReCheckCombined();
         mapConstructor.RemoveBlock(this);
         gameObject.SetActive(false);
+        isResolved = true;
         CheckNewChildBlock();
     }
     [Button]

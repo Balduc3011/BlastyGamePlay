@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3151857995701250150
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8801415850674290479}
+  m_Layer: 8
+  m_Name: CombinedBlockParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8801415850674290479
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3151857995701250150}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7456044415319118766}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3184715604600594903
 GameObject:
   m_ObjectHideFlags: 0
@@ -180,7 +211,6 @@ MonoBehaviour:
   colorCode: 0
   blockShape: 0
   moveDirection: 0
-  isIced: 0
   mapConstructor: {fileID: 0}
   colliders:
   - {fileID: 3709871554095886285}
@@ -209,7 +239,14 @@ MonoBehaviour:
   checkedCoordinate: 
   selectedMeshRenderer: {fileID: 0}
   lightMaterial: {fileID: 2100000, guid: 2f3cc03e488fa6d468d733089466c30b, type: 2}
+  isResolved: 0
+  isIced: 0
   iceBlock: {fileID: 0}
+  isCombined: 0
+  combinedBlockParent: {fileID: 8801415850674290479}
+  combinedBlocks: []
+  combinedTargets: []
+  realCombinedTargets: []
 --- !u!65 &3709871554095886285
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -426,7 +463,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 8801415850674290479}
   m_Father: {fileID: 1881948602508868162}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2610391114884937161
