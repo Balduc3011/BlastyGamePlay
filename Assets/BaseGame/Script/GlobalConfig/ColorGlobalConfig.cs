@@ -16,6 +16,8 @@ public class ColorGlobalConfig : GlobalConfig<ColorGlobalConfig>
     public PhysicMaterial blockPhysicMaterial;
     public IceCounter iceCounterPrefab;
     public CombinedBlock combinedBlockPrefab;
+    public HoverBlock hoverBlockPrefab;
+    public FadingBlock fadingBlockPrefab;
     public Transform arrowBasePrefab;
     public List<TestMap> TestMaps;
 
@@ -150,13 +152,13 @@ public class ColorGlobalConfig : GlobalConfig<ColorGlobalConfig>
     
     public Color GetOutlineColor(ColorCode colorCode)
     {
-        // foreach (BlockColorConfig config in blockColorConfigs)
-        // {
-        //     if (config.colorCode == colorCode)
-        //     {
-        //         return config.outLineColor;
-        //     }
-        // }
+        foreach (BlockColorConfig config in blockColorConfigs)
+        {
+            if (config.colorCode == colorCode)
+            {
+                return config.outLineColor;
+            }
+        }
         return Color.white; // Default color if not found
     }
 }

@@ -21,7 +21,7 @@ public class ExploseBlock : BaseBlock
         this.colorCode = colorCode;
         OnChangeColorCode();
         InitMaterial();
-        outline = null;
+        //outline = null;
         selectedMeshRenderer.materials = lightMaterials;
         Explose(delay);
     }
@@ -33,7 +33,7 @@ public class ExploseBlock : BaseBlock
     public void Explose(float delay)
     {
         transform.localScale = Vector3.one;
-        transform.DOScale(0, 0.15f).SetEase(Ease.InBack).SetDelay(delay * 0.1f)
+        transform.DOScale(0, 0.15f).SetEase(Ease.InBack).SetDelay(delay * 0.15f)
             .OnComplete(Deactivate);
     }
 

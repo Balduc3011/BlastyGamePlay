@@ -23,7 +23,7 @@ public class BaseBlock : MonoBehaviour
     public List<Coordinate> blockAbsoluteCoordinates;
     [HideInInspector] public IndexShow indexShowPrefab;
     [HideInInspector] public List<IndexShow> indexShows;
-    public Outline outline;
+    public Outline blockOutline;
     public Transform blockModel;
     [HideInInspector] public Vector3 clickPosition;
     [HideInInspector] public Vector3 clickDelta;
@@ -73,7 +73,8 @@ public class BaseBlock : MonoBehaviour
         rigidbody.velocity = Vector3.zero;
         rigidbody.constraints = RigidbodyConstraints.FreezeAll;
         blockModelY = blockModel.localPosition.y;
-        outline.enabled = false;
+        if(blockOutline != null)
+            blockOutline.enabled = false;
         SetBlockNewPos();
         InitMaterial();
     }
@@ -146,12 +147,12 @@ public class BaseBlock : MonoBehaviour
         SetBlockNewPos();
         SetWorldCoordinate();
     }
-    public void OnChangeColorCode()
+    public virtual void OnChangeColorCode()
     {
         ClearBlock();
         GameObject go = ColorGlobalConfig.Instance.GetBlockAll(colorCode);
-        if(outline != null)
-            outline.OutlineColor = ColorGlobalConfig.Instance.GetOutlineColor(colorCode);
+        if(blockOutline != null)
+            blockOutline.OutlineColor = ColorGlobalConfig.Instance.GetOutlineColor(colorCode);
         if (go != null)
         {
             GameObject newSpawn = (GameObject)PrefabUtility.InstantiatePrefab(go);
@@ -170,7 +171,7 @@ public class BaseBlock : MonoBehaviour
             DestroyImmediate(blockBase.gameObject);
     }
     [Button]
-    public void OnChangeShape()
+    public virtual void OnChangeShape()
     {
         BlockShapeData blockShapeData = ColorGlobalConfig.Instance.GetBlockShapeData(blockShape);
         if (blockShapeData == null)
@@ -597,8 +598,8 @@ public class BaseBlock : MonoBehaviour
             if (combinedTargets[i] != null && combinedTargets[i] != this)
             {
                 combinedTargets[i].SetBGBlock(!pick);
-                if(combinedTargets[i].outline != null)
-                    combinedTargets[i].outline.enabled = pick;
+                if(combinedTargets[i].blockOutline != null)
+                    combinedTargets[i].blockOutline.enabled = pick;
                 if (!pick)
                 {
                     combinedTargets[i].rigidbody.velocity = Vector3.zero;
@@ -685,19 +686,19 @@ public class BaseBlock : MonoBehaviour
             return;
         if (isHighlighted && !this.isHighlighted)
         {
-            if(outline != null)
-                outline.enabled = false;
+            if(blockOutline != null)
+                blockOutline.enabled = false;
             selectedMeshRenderer.materials = lightMaterials;
         }
         else if(!isHighlighted && this.isHighlighted)
         {
-            if(outline != null)
-                outline.enabled = false;
+            if(blockOutline != null)
+                blockOutline.enabled = false;
             selectedMeshRenderer.materials = baseMaterials;
         }
         this.isHighlighted = isHighlighted;
-        if(outline != null)
-            outline.enabled = pickingUp;
+        if(blockOutline != null)
+            blockOutline.enabled = pickingUp;
     }
     
     void SetBlockNewPos()
@@ -781,6 +782,8 @@ public class BaseBlock : MonoBehaviour
     void CheckHighLightBlock()
     {
         Coordinate checkCoordinate;
+        if(mapConstructor == null)
+            return;
         if (mapConstructor.CheckLastCheckCoordinate(transform.position, out checkCoordinate))
         {
             if(checkCoordinate.xIndex != lastCheckCoordinate.xIndex || 
@@ -801,16 +804,16 @@ public class BaseBlock : MonoBehaviour
             rigidbody.isKinematic = false;
             rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
             pickingUp = true;
-            if(outline != null)
-                outline.enabled = pickingUp;
+            if(blockOutline != null)
+                blockOutline.enabled = pickingUp;
         }
         else
         {
             rigidbody.isKinematic = true;
             rigidbody.constraints = RigidbodyConstraints.FreezeAll;
             pickingUp = false;
-            if(outline != null)
-                outline.enabled = pickingUp;
+            if(blockOutline != null)
+                blockOutline.enabled = pickingUp;
         }
     }
     

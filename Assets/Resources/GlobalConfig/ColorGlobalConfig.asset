@@ -14,61 +14,61 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blockColorConfigs:
   - colorCode: 1
-    outLineColor: {r: 0.21960786, g: 0.68235296, b: 0.9607844, a: 1}
+    outLineColor: {r: 0.52156866, g: 0.9725491, b: 1, a: 1}
     blockMaterial: {fileID: 2100000, guid: da8a5012b4fabf44d8cabecd417282b2, type: 2}
     grainMaterial: {fileID: 2100000, guid: f146a79c6144c5649b38529fad2c12f4, type: 2}
     blockAll: {fileID: 919132149155446097, guid: 84a6e4ce64bbc564b9827c3dc0f2a857, type: 3}
     gateMesh: {fileID: 3935520107083071274, guid: 146ff8199ba96f0459467ef30641135c, type: 3}
   - colorCode: 2
-    outLineColor: {r: 1, g: 0.3019608, b: 0, a: 0}
+    outLineColor: {r: 0.52156866, g: 0.9725491, b: 1, a: 1}
     blockMaterial: {fileID: 2100000, guid: e2bd060b46bd7784a8c6cbd7876fff38, type: 2}
     grainMaterial: {fileID: 2100000, guid: 0ff1bac766514c2448d001b95023f101, type: 2}
     blockAll: {fileID: 919132149155446097, guid: b065b46f7ee25d046aa8d92037b94835, type: 3}
     gateMesh: {fileID: -8620415812867209302, guid: 6f44811654a15a34b9722f70c637685a, type: 3}
   - colorCode: 3
-    outLineColor: {r: 0, g: 0, b: 0, a: 0}
+    outLineColor: {r: 0.58431375, g: 0.91372555, b: 0.3254902, a: 1}
     blockMaterial: {fileID: 2100000, guid: e88890a6dc408b84c9025a4c22a6a849, type: 2}
     grainMaterial: {fileID: 2100000, guid: 7f9649bbe5e920443862e515bd4d8406, type: 2}
     blockAll: {fileID: 919132149155446097, guid: 6cc467ea99686d74fb08e03d83a92d09, type: 3}
     gateMesh: {fileID: 1038750107831768066, guid: b6bd8ea21acf6de47be6131858d071f9, type: 3}
   - colorCode: 4
-    outLineColor: {r: 0, g: 0, b: 0, a: 0}
+    outLineColor: {r: 0.58431375, g: 0.91372555, b: 0.3254902, a: 1}
     blockMaterial: {fileID: 2100000, guid: 3ffc2a28f5eea944988e16b3c1f8a664, type: 2}
     grainMaterial: {fileID: 2100000, guid: 2ca0b1bcfe5cd74418f149d3c60ddde2, type: 2}
     blockAll: {fileID: 919132149155446097, guid: 4d7111a04f081ba4c998cab54c6ade83, type: 3}
     gateMesh: {fileID: -8132265839171366688, guid: 764237717825f844ba26a22eea9c708c, type: 3}
   - colorCode: 5
-    outLineColor: {r: 0, g: 0, b: 0, a: 0}
+    outLineColor: {r: 0.52156866, g: 0.9725491, b: 1, a: 1}
     blockMaterial: {fileID: 2100000, guid: 657a1f1b05e02a449a61f412e7ecbc9d, type: 2}
     grainMaterial: {fileID: 2100000, guid: f7cae1edfe4130844bef31f2293159a0, type: 2}
     blockAll: {fileID: 919132149155446097, guid: 9ec22f739a573614a9c357d9ab2f71b7, type: 3}
     gateMesh: {fileID: -7546467533964439645, guid: 5dab9a8dbe2919c48a08e6bf2c3d47f8, type: 3}
   - colorCode: 6
-    outLineColor: {r: 0, g: 0, b: 0, a: 0}
+    outLineColor: {r: 1, g: 0.5176471, b: 0.3137255, a: 1}
     blockMaterial: {fileID: 2100000, guid: 703bbb060a3d8ff46b6e2b1e3493767c, type: 2}
     grainMaterial: {fileID: 2100000, guid: 72d3750dcbb17924fb577dd7a5100eb8, type: 2}
     blockAll: {fileID: 919132149155446097, guid: ff70024fa0dc068498187ab84f6106db, type: 3}
     gateMesh: {fileID: 2271508976450786084, guid: a65e861c1c5b9d24a87311571895186e, type: 3}
   - colorCode: 7
-    outLineColor: {r: 0, g: 0, b: 0, a: 0}
+    outLineColor: {r: 0.9450981, g: 0.34117648, b: 1, a: 1}
     blockMaterial: {fileID: 2100000, guid: c4261170601e8d94887708ab9c83ec73, type: 2}
     grainMaterial: {fileID: 2100000, guid: 916cf1f941793ae4cb9433d292cb11e9, type: 2}
     blockAll: {fileID: 919132149155446097, guid: e124d7ac563395a41b10591526ec1cf7, type: 3}
     gateMesh: {fileID: 4776347582098379705, guid: a21191b9e28aa984a86f04df2842a65e, type: 3}
   - colorCode: 8
-    outLineColor: {r: 0, g: 0, b: 0, a: 0}
+    outLineColor: {r: 0.47058827, g: 0.227451, b: 0.9725491, a: 1}
     blockMaterial: {fileID: 2100000, guid: 13493d3cf6520d343a7bdf49bf7c42d2, type: 2}
     grainMaterial: {fileID: 2100000, guid: f34e7dd17d32f3d4ca11c7788e673625, type: 2}
     blockAll: {fileID: 919132149155446097, guid: c06d2413910a14349a63ad0f6c82e94d, type: 3}
     gateMesh: {fileID: -7880711996766987663, guid: ba36026fe9ba4064b98cb0c0c0c1a603, type: 3}
   - colorCode: 9
-    outLineColor: {r: 0, g: 0, b: 0, a: 0}
+    outLineColor: {r: 1, g: 0.19215688, b: 0.20392159, a: 1}
     blockMaterial: {fileID: 0}
     grainMaterial: {fileID: 2100000, guid: f948b9ccef5fb9948a7319162b235d8e, type: 2}
     blockAll: {fileID: 919132149155446097, guid: 8c471d3a24f17a54c933d3577bc61d8e, type: 3}
     gateMesh: {fileID: 3347191747185522547, guid: ddffcb8eba06f2a48acb7227e92040ab, type: 3}
   - colorCode: 10
-    outLineColor: {r: 0, g: 0, b: 0, a: 0}
+    outLineColor: {r: 1, g: 0.627451, b: 0.20392159, a: 1}
     blockMaterial: {fileID: 0}
     grainMaterial: {fileID: 2100000, guid: 9985b64341ab3b8469b385dd7dd6b507, type: 2}
     blockAll: {fileID: 919132149155446097, guid: 7e0072fe9c0cb3b45a0e0a9367114d5a, type: 3}
@@ -405,6 +405,8 @@ MonoBehaviour:
   blockPhysicMaterial: {fileID: 13400000, guid: 589e1261325bfb54d8b4e9b04b4ee4ff, type: 2}
   iceCounterPrefab: {fileID: 1993043985306763567, guid: a8adf10c33745f2458221d3abc40316a, type: 3}
   combinedBlockPrefab: {fileID: 8813651341142041312, guid: 75ea8153ada82234a84461ca74c29a34, type: 3}
+  hoverBlockPrefab: {fileID: 7330462333461242902, guid: d51ae28d9d282124d83c6e40cb99c9ed, type: 3}
+  fadingBlockPrefab: {fileID: 2832488956898876370, guid: 0e034bd2f7235e14abac96a20e3f3eb3, type: 3}
   arrowBasePrefab: {fileID: 922644336757986069, guid: acead762dcb478744a39ff8192670737, type: 3}
   TestMaps:
   - tileCoordinates:

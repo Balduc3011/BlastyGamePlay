@@ -28,6 +28,9 @@ public class MapConstructor : MonoBehaviour
     public List<EliminateLine> eliminateLines;
     
     public Coordinate lastCheckCoordinate;
+    public List<HoverBlock> hoverBlocks;
+    public List<FadingBlock> FadingBlocks;
+    public Transform poolTrs;
 
     private void Start()
     {
@@ -331,6 +334,7 @@ public class MapConstructor : MonoBehaviour
         CheckBlockEliminate();
         EliminateBlockCoordinate();
         EliminateBlock();
+        DeActiveHoverBlocks();
     }
 
     void CheckBlockEliminate()
@@ -509,11 +513,20 @@ public class MapConstructor : MonoBehaviour
             {
                 blocks[i1].OnOneLineResolved();
             }
+            var fadingBlock = GetFadingBlock();
+            //eliminateLines[i].hoverBlock = hoverBlock;
+            fadingBlock.transform.position = (eliminateLines[i].toEliminateGates[0].transform.position +
+                                             eliminateLines[i].toEliminateGates[1].transform.position) / 2;
+            float yAngle = gate1.yIndex == gate2.yIndex ? 0f : 90f;
+            fadingBlock.transform.eulerAngles = new Vector3(0, yAngle , 0);
+            float size = Mathf.Abs((gate1.xIndex - gate2.xIndex) + (gate1.yIndex - gate2.yIndex)) + 1;
+            fadingBlock.Init(eliminateLines[i].toEliminateGates[0].colorCode, size);
         }
     }
 
     public void CheckHighLightBlock()
     {
+        DeActiveHoverBlocks();
         CheckBlockEliminate();
         CheckEliminableBlock();
         HighLightLine();
@@ -557,6 +570,16 @@ public class MapConstructor : MonoBehaviour
             {
                 highlightedBlocks.Add(eliminateLines[i].toEliminateBlocks[i1]);
             }
+            var hoverBlock = GetHoverBlock();
+            //eliminateLines[i].hoverBlock = hoverBlock;
+            hoverBlock.transform.position = (eliminateLines[i].toEliminateGates[0].transform.position +
+                                             eliminateLines[i].toEliminateGates[1].transform.position) / 2;
+            Coordinate gate0 = eliminateLines[i].toEliminateGates[0].floorTileWall.floorTile.coordinate;
+            Coordinate gate1 = eliminateLines[i].toEliminateGates[1].floorTileWall.floorTile.coordinate;
+            float yAngle = gate0.yIndex == gate1.yIndex ? 0f : 90f;
+            hoverBlock.transform.eulerAngles = new Vector3(0, yAngle , 0);
+            float size = Mathf.Abs((gate0.xIndex - gate1.xIndex) + (gate0.yIndex - gate1.yIndex)) + 1;
+            hoverBlock.Init(eliminateLines[i].toEliminateGates[0].colorCode, size);
         }
 
         for (int i = 0; i < gates.Count; i++)
@@ -568,6 +591,55 @@ public class MapConstructor : MonoBehaviour
             blocks[i].SetHighlighted(highlightedBlocks.Contains(blocks[i]));
         }
     }
+    #endregion
+
+    #region ETC
+
+    public HoverBlock GetHoverBlock()
+    {
+        for (var i = 0; i < hoverBlocks.Count; i++)
+        {
+            if (!hoverBlocks[i].gameObject.activeSelf)
+            {
+                hoverBlocks[i].gameObject.SetActive(true);
+                return hoverBlocks[i];
+            }
+        }
+        HoverBlock hoverBlock = Instantiate(ColorGlobalConfig.Instance.hoverBlockPrefab, poolTrs);
+        hoverBlocks.Add(hoverBlock);
+        return hoverBlock;
+    }
+    
+    public void DeActiveHoverBlocks()
+    {
+        for (var i = 0; i < hoverBlocks.Count; i++)
+        {
+            hoverBlocks[i].gameObject.SetActive(false);
+        }
+    }
+    
+    public FadingBlock GetFadingBlock()
+    {
+        for (var i = 0; i < FadingBlocks.Count; i++)
+        {
+            if (!FadingBlocks[i].gameObject.activeSelf)
+            {
+                FadingBlocks[i].gameObject.SetActive(true);
+                return FadingBlocks[i];
+            }
+        }
+        FadingBlock fadingBlock = Instantiate(ColorGlobalConfig.Instance.fadingBlockPrefab, poolTrs);
+        FadingBlocks.Add(fadingBlock);
+        return fadingBlock;
+    }
+    public void DeActiveFadingBlocks()
+    {
+        for (var i = 0; i < FadingBlocks.Count; i++)
+        {
+            FadingBlocks[i].gameObject.SetActive(false);
+        }
+    }
+
     #endregion
     
 }
@@ -602,6 +674,7 @@ public class EliminateLine
     public List<Coordinate> toEliminateCoordinates = new List<Coordinate>();
     public List<BaseBlock> toEliminateBlocks = new List<BaseBlock>();
     public List<ExploseBlock> toExplodeBlocks = new List<ExploseBlock>();
+    public HoverBlock hoverBlock;
     public EliminateLine(List<Coordinate> coordinates)
     {
         toEliminateCoordinates = coordinates;

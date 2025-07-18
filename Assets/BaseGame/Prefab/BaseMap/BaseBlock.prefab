@@ -221,7 +221,7 @@ MonoBehaviour:
   blockAbsoluteCoordinates: []
   indexShowPrefab: {fileID: 2773190514196034242}
   indexShows: []
-  outline: {fileID: 2610391114884937161}
+  blockOutline: {fileID: 0}
   blockModel: {fileID: 7456044415319118766}
   clickPosition: {x: 0, y: 0, z: 0}
   clickDelta: {x: 0, y: 0, z: 0}
@@ -234,6 +234,12 @@ MonoBehaviour:
   childBlocks: []
   checkedCoordinate: 
   selectedMeshRenderer: {fileID: 0}
+  baseMaterials:
+  - {fileID: 0}
+  - {fileID: 0}
+  lightMaterials:
+  - {fileID: 0}
+  - {fileID: 0}
   lightMaterial: {fileID: 2100000, guid: 2f3cc03e488fa6d468d733089466c30b, type: 2}
   isResolved: 0
   arrowBase: {fileID: 0}
@@ -473,7 +479,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7582442614883683483}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
   m_Name: 
